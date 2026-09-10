@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-09T17:31:15.366Z",
+  "title": "Design System: VARzômetro",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Laranja de Cal Aérea",
+        "canonical": "#E07C0A",
+        "tonalRamp": [
+          "#2A1701",
+          "#4A2802",
+          "#6B3A03",
+          "#8E4E04",
+          "#B26206",
+          "#E07C0A",
+          "#F0A94A",
+          "#FDE7C6"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Laranja Queimado",
+        "canonical": "#C46A05"
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Laranja Claro",
+        "canonical": "#F0A94A"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Grafite de Fundo",
+        "canonical": "#0F0F12",
+        "tonalRamp": [
+          "#0A0A0C",
+          "#0F0F12",
+          "#16161B",
+          "#1C1C23",
+          "#26262E",
+          "#3A3A45",
+          "#6B6B78",
+          "#C9C9D2"
+        ]
+      },
+      "ink-surface": {
+        "role": "neutral",
+        "displayName": "Superfície",
+        "canonical": "#16161B"
+      },
+      "ink-line": {
+        "role": "neutral",
+        "displayName": "Linha",
+        "canonical": "#26262E"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Cinza de Apoio",
+        "canonical": "#A1A1AA",
+        "tonalRamp": [
+          "#17171A",
+          "#27272A",
+          "#3F3F46",
+          "#52525B",
+          "#71717A",
+          "#A1A1AA",
+          "#D4D4D8",
+          "#F4F4F5"
+        ]
+      },
+      "clube-spfc": {
+        "role": "tertiary",
+        "displayName": "Vermelho São Paulo",
+        "canonical": "#E30613",
+        "tonalRamp": [
+          "#2C0104",
+          "#4A0208",
+          "#6E030C",
+          "#920410",
+          "#B60515",
+          "#E30613",
+          "#F05A63",
+          "#FBC9CD"
+        ]
+      },
+      "clube-sccp": {
+        "role": "tertiary",
+        "displayName": "Branco Corinthians",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#1A1A1A",
+          "#2E2E2E",
+          "#4D4D4D",
+          "#757575",
+          "#A3A3A3",
+          "#D6D6D6",
+          "#FFFFFF"
+        ]
+      },
+      "clube-sep": {
+        "role": "tertiary",
+        "displayName": "Verde Palmeiras",
+        "canonical": "#00A868",
+        "tonalRamp": [
+          "#002214",
+          "#003B23",
+          "#005432",
+          "#006437",
+          "#008A55",
+          "#00A868",
+          "#4FD49C",
+          "#C6F3DF"
+        ]
+      },
+      "clube-sfc": {
+        "role": "tertiary",
+        "displayName": "Cinza Santos",
+        "canonical": "#D4D4D8",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#1A1A1A",
+          "#2E2E2E",
+          "#4D4D4D",
+          "#757575",
+          "#A3A3A3",
+          "#D4D4D8",
+          "#F4F4F5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título do herói e da página de blog. Um por página, no máximo."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título de seção, sempre precedido de um eyebrow laranja."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Título de card, nome de integrante, título de episódio."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido. No corpo do artigo a entrelinha sobe para 1.85 e a coluna trava em 768px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrow de seção, papel do integrante, número do episódio. Caixa alta, laranja ou cinza."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Selo de clube, numero do episodio, duracao, views, titulo de corte. Degrau de sinalizacao, nunca de leitura."
+      }
+    },
+    "shadows": [
+      {
+        "name": "halo-suave",
+        "value": "0 10px 40px -18px rgba(224,124,10,0.55)",
+        "purpose": "Botão primário e hover de card. Luz laranja difusa por baixo, sem contorno."
+      },
+      {
+        "name": "halo-marcado",
+        "value": "0 0 0 1px rgba(224,124,10,0.28), 0 12px 40px -12px rgba(224,124,10,0.35)",
+        "purpose": "Cartão-citação e botão fixo de desktop. Anel de 1px somado à luz."
+      },
+      {
+        "name": "realce-interno",
+        "value": "inset 0 1px 0 0 rgba(255,255,255,0.04)",
+        "purpose": "Fio de luz no topo de superfícies. Uso pontual."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-smooth",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Easing padrão de todo estado e entrada. Sai rápido e assenta devagar."
+      },
+      {
+        "name": "duration-state",
+        "value": "200ms",
+        "purpose": "Hover e foco de botão, link e ícone."
+      },
+      {
+        "name": "duration-surface",
+        "value": "300ms",
+        "purpose": "Card subindo no hover, header ganhando fundo, drawer abrindo."
+      },
+      {
+        "name": "duration-media",
+        "value": "500ms",
+        "purpose": "Zoom de miniatura no hover do card de mídia."
+      },
+      {
+        "name": "fade-up",
+        "value": "translateY(14px) + opacity 0 → 1 em 600ms ease-out",
+        "purpose": "Entrada escalonada dos blocos do herói, com atrasos de 80ms a 360ms."
+      },
+      {
+        "name": "pulse-dot",
+        "value": "opacity 1 → 0.45 e scale 1 → 0.82 em 2s, infinito",
+        "purpose": "Único movimento contínuo do site: o pulso do badge do herói."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "content",
+        "value": "1200px"
+      },
+      {
+        "name": "prose",
+        "value": "768px"
+      },
+      {
+        "name": "toque",
+        "value": "pointer: coarse"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão Primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A ação principal de qualquer tela: assistir, ouvir, enviar.",
+      "html": "<button class=\"ds-btn-primary\">Assistir no YouTube</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #E07C0A; color: #FFFFFF; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; font-weight: 700; padding: 14px 24px; border: none; border-radius: 12px; box-shadow: 0 10px 40px -18px rgba(224,124,10,0.55); cursor: pointer; transition: background 200ms cubic-bezier(0.22,1,0.36,1), transform 200ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background: #C46A05; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #0F0F12, 0 0 0 4px #E07C0A; }"
+    },
+    {
+      "name": "Botão Fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ação secundária ao lado da principal. A borda faz todo o trabalho.",
+      "html": "<button class=\"ds-btn-ghost\">Ouvir no Spotify</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #16161B; color: #E4E4E7; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; font-weight: 700; padding: 14px 24px; border: 1px solid #26262E; border-radius: 12px; cursor: pointer; transition: border-color 200ms cubic-bezier(0.22,1,0.36,1), color 200ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-ghost:hover { border-color: rgba(224,124,10,0.5); color: #FFFFFF; } .ds-btn-ghost:active { transform: scale(0.98); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px #0F0F12, 0 0 0 4px #E07C0A; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Superfície padrão de conteúdo. Plana em repouso, sobe 4px e ganha halo no hover.",
+      "html": "<article class=\"ds-card\"><span class=\"ds-card-eyebrow\">EP #16</span><h3 class=\"ds-card-title\">Memphis volta e os paulistas avançam</h3><p class=\"ds-card-body\">A volta de Memphis, o avanço dos times paulistas e o que muda na briga do estadual.</p></article>",
+      "css": ".ds-card { display: block; background: #16161B; border: 1px solid #26262E; border-radius: 16px; padding: 24px; max-width: 340px; transition: border-color 300ms cubic-bezier(0.22,1,0.36,1), box-shadow 300ms cubic-bezier(0.22,1,0.36,1), transform 300ms cubic-bezier(0.22,1,0.36,1); } .ds-card:hover { border-color: rgba(224,124,10,0.5); box-shadow: 0 10px 40px -18px rgba(224,124,10,0.55); transform: translateY(-4px); } .ds-card-eyebrow { display: block; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #E07C0A; } .ds-card-title { margin: 10px 0 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 18px; font-weight: 700; line-height: 1.35; color: #FFFFFF; } .ds-card-body { margin: 10px 0 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.625; color: #A1A1AA; }"
+    },
+    {
+      "name": "Tag de Clube",
+      "kind": "chip",
+      "refersTo": "tag-clube",
+      "description": "Selo que identifica de qual clube é o assunto. Cor derivada do clube, sempre em opacidade baixa.",
+      "html": "<span class=\"ds-tag-clube ds-tag-spfc\">SPFC</span> <span class=\"ds-tag-clube ds-tag-sccp\">SCCP</span> <span class=\"ds-tag-clube ds-tag-sep\">SEP</span> <span class=\"ds-tag-clube ds-tag-sfc\">SFC</span>",
+      "css": ".ds-tag-clube { display: inline-flex; align-items: center; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; border: 1px solid transparent; } .ds-tag-spfc { color: #E30613; background: rgba(227,6,19,0.12); border-color: rgba(227,6,19,0.35); } .ds-tag-sccp { color: #F4F4F5; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.25); } .ds-tag-sep { color: #00A868; background: rgba(0,168,104,0.14); border-color: rgba(0,168,104,0.35); } .ds-tag-sfc { color: #D4D4D8; background: rgba(212,212,216,0.10); border-color: rgba(212,212,216,0.25); }"
+    },
+    {
+      "name": "Filtro do Blog",
+      "kind": "chip",
+      "refersTo": "chip-filtro",
+      "description": "Botão de filtro por clube na listagem do blog. Ativo é laranja sólido.",
+      "html": "<button class=\"ds-chip ds-chip-ativo\">Todos <span class=\"ds-chip-num\">4</span></button> <button class=\"ds-chip\">Corinthians <span class=\"ds-chip-num\">1</span></button>",
+      "css": ".ds-chip { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 12px; font-weight: 700; padding: 10px 16px; border-radius: 12px; background: #16161B; color: #A1A1AA; border: 1px solid #26262E; cursor: pointer; transition: all 200ms cubic-bezier(0.22,1,0.36,1); } .ds-chip:hover { border-color: rgba(224,124,10,0.4); color: #FFFFFF; } .ds-chip-ativo { background: #E07C0A; border-color: #E07C0A; color: #FFFFFF; } .ds-chip-num { margin-left: 6px; color: #71717A; } .ds-chip-ativo .ds-chip-num { color: rgba(255,255,255,0.7); }"
+    },
+    {
+      "name": "Link de Navegação",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Link do header. Cinza em repouso, branco sobre um fundo de 4% no hover.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Início</a><a class=\"ds-nav-link\" href=\"#\">O Projeto</a><a class=\"ds-nav-link\" href=\"#\">A Bancada</a><a class=\"ds-nav-link\" href=\"#\">Blog</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 4px; background: rgba(15,15,18,0.85); padding: 12px; border-radius: 12px; } .ds-nav-link { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #A1A1AA; text-decoration: none; padding: 8px 14px; border-radius: 8px; transition: background 200ms cubic-bezier(0.22,1,0.36,1), color 200ms cubic-bezier(0.22,1,0.36,1); } .ds-nav-link:hover { background: rgba(255,255,255,0.04); color: #FFFFFF; } .ds-nav-link:focus-visible { outline: none; box-shadow: 0 0 0 2px #E07C0A; }"
+    },
+    {
+      "name": "Card de Clube",
+      "kind": "custom",
+      "refersTo": "clube-card",
+      "description": "Componente-assinatura do herói: faixas da camisa no topo, selo e apelido na cor do clube.",
+      "html": "<div class=\"ds-clube\" style=\"--clube:#E30613\"><div class=\"ds-clube-faixas\"><span style=\"background:#E30613\"></span><span style=\"background:#FFFFFF\"></span><span style=\"background:#0B0B0B\"></span></div><div class=\"ds-clube-corpo\"><span class=\"ds-clube-tag\">SPFC</span><p class=\"ds-clube-nome\">São Paulo FC</p><p class=\"ds-clube-torcedor\">São-paulino na mesa</p><span class=\"ds-clube-apelido\">Tricolor</span></div></div>",
+      "css": ".ds-clube { position: relative; overflow: hidden; width: 240px; background: #16161B; border: 1px solid #26262E; border-radius: 16px; transition: border-color 300ms cubic-bezier(0.22,1,0.36,1), transform 300ms cubic-bezier(0.22,1,0.36,1); } .ds-clube:hover { border-color: var(--clube); transform: translateY(-4px); } .ds-clube-faixas { display: flex; height: 6px; } .ds-clube-faixas span { flex: 1; } .ds-clube-corpo { padding: 20px; } .ds-clube-tag { display: inline-flex; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; color: var(--clube); background: color-mix(in srgb, var(--clube) 8%, transparent); border: 1px solid color-mix(in srgb, var(--clube) 33%, transparent); } .ds-clube-nome { margin: 16px 0 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 16px; font-weight: 700; color: #FFFFFF; } .ds-clube-torcedor { margin: 4px 0 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 12px; color: #A1A1AA; } .ds-clube-apelido { display: block; margin-top: 16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clube); opacity: 0.7; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Placar Noturno",
+    "overview": "O painel de um estádio à noite: fundo quase preto, informação em laranja, nada sobrando. A tela não tenta ser acolhedora — ela é direta, do jeito que um placar é direto. O torcedor chega do TikTok no meio da noite, no celular, e o site tem poucos segundos para dizer o que é e mandar ele para o episódio.\n\nA densidade é baixa e o contraste é alto. O fundo grafite #0F0F12 domina, os cartões sobem meio tom para #16161B, e uma única cor quente carrega toda a energia. Não há ilustração, não há foto de banco de imagem, não há degradê colorido: a única textura é uma malha de pontos laranja a 14% de opacidade sobre o topo da página, que funciona como o granulado de um telão visto de perto.\n\nA identidade se sustenta por três coisas: o laranja usado com avareza, a tipografia pesada em 800 e a cor de cada clube aparecendo apenas onde aquele clube é o assunto. O anti-referência confirmado pelo cliente é rede social genérica — cartões idênticos, sem ponto de vista, que poderiam ser de qualquer nicho. Se uma tela pode ser recolorida e virar de outro assunto sem parecer estranha, ela falhou.",
+    "keyCharacteristics": [
+      "Escuro por padrão, sem tema claro",
+      "Um único acento quente; cor de clube não é decoração",
+      "Tipografia pesada (800) fazendo o trabalho de hierarquia",
+      "Profundidade por borda fina e brilho, não por sombra difusa",
+      "Mobile é o cenário principal, não a adaptação"
+    ],
+    "rules": [
+      {
+        "name": "A Regra do Laranja Escasso",
+        "body": "O laranja marca ação ou hierarquia, nunca preenche área. Se mais de 10% de uma tela está laranja, ele deixou de ser sinal e virou fundo.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra das Quatro Torcidas",
+        "body": "Cor de clube só aparece onde aquele clube é o assunto — selo, faixa, tag de artigo. Nunca como cor de interface. E nunca uma sozinha: as quatro têm o mesmo peso visual em qualquer tela onde apareçam.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Peso, Não da Cor",
+        "body": "Hierarquia se resolve por tamanho e peso. Colorir um título para dar destaque é sinal de que o tamanho está errado. A exceção é a palavra-chave laranja dentro de um título — no máximo uma por título.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Texto Branco",
+        "body": "Texto principal é branco puro; apoio é #A1A1AA. Não existe um terceiro cinza intermediário no sistema.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Polegar",
+        "body": "O público chega de vídeo vertical, no celular. Toda faixa horizontal rola com o dedo e faz snap; as setas de navegação são um extra de desktop, nunca o único caminho. A barra fixa inferior com YouTube e Spotify existe só no celular, aparecendo depois de 520px de rolagem.",
+        "section": "layout"
+      },
+      {
+        "name": "A Regra da Luz, Não do Peso",
+        "body": "Sombra neste sistema é iluminação laranja vinda de trás do elemento. Sombra preta difusa é proibida — é o vocabulário de Material Design e faz o site parecer template.",
+        "section": "elevation"
+      },
+      {
+        "name": "A Regra dos 44 Pixels",
+        "body": "Em telas sem mouse (pointer: coarse), nenhum controle tem menos de 44px de altura. A regra vale por consulta de ponteiro, nao por largura de tela: um notebook com touch tambem recebe o alvo maior, e o desktop mantem a densidade original. Links de texto dentro de paragrafo sao a unica excecao.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "Do usar o laranja #E07C0A como sinal de ação ou hierarquia, em no máximo 10% da área de qualquer tela.",
+      "Do construir profundidade com a dupla superfície + borda de 1px em #26262E antes de pensar em sombra.",
+      "Do resolver hierarquia com peso 800 e tamanho, não com cor.",
+      "Do dar às quatro torcidas o mesmo peso visual sempre que elas aparecerem juntas — mesma área, mesma posição na grade, mesma saturação.",
+      "Do desenhar a versão de celular primeiro: faixas que arrastam, alvo mínimo de 44px, barra fixa inferior para os dois destinos principais.",
+      "Do manter todo ícone como SVG inline de traço 1.8px.",
+      "Do condicionar realce de hover a @media (hover: hover) and (pointer: fine). No toque o :hover gruda depois do toque; ali o feedback certo e :active."
+    ],
+    "donts": [
+      "Don't usar sombra preta difusa. A sombra deste sistema é laranja e só aparece em resposta a estado.",
+      "Don't introduzir tema claro. O escuro não é preferência, é a identidade.",
+      "Don't usar cor de clube como cor de interface — botão verde, fundo vermelho, borda alviverde. Cor de clube identifica, não decora.",
+      "Don't destacar um clube sozinho em elemento estrutural (herói, banner, ordem de listagem).",
+      "Don't carregar biblioteca de ícones, fonte externa em runtime ou imagem de banco de imagens.",
+      "Don't empilhar cards idênticos sem hierarquia — é exatamente a rede social genérica que o cliente rejeitou."
+    ]
+  }
+}

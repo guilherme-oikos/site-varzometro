@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Capa padrão do blog do VARzômetro">
+  <defs>
+    <linearGradient id="fundoBlog" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1C1C23"/>
+      <stop offset="1" stop-color="#0A0A0C"/>
+    </linearGradient>
+    <pattern id="pontosBlog" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#E07C0A" fill-opacity="0.16"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#fundoBlog)"/>
+  <rect width="1200" height="675" fill="url(#pontosBlog)"/>
+  <circle cx="980" cy="120" r="240" fill="#E07C0A" fill-opacity="0.08"/>
+
+  <rect x="80" y="470" width="176" height="70" rx="16" fill="#E07C0A"/>
+  <text x="168" y="519" font-family="'Segoe UI', system-ui, sans-serif" font-size="42" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">VAR</text>
+
+  <text x="80" y="300" font-family="'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="700" fill="#E07C0A" letter-spacing="7">BLOG E OPINIÃO</text>
+  <text x="80" y="380" font-family="'Segoe UI', system-ui, sans-serif" font-size="58" font-weight="800" fill="#FFFFFF">Análise da rodada</text>
+  <text x="80" y="430" font-family="'Segoe UI', system-ui, sans-serif" font-size="28" font-weight="600" fill="#A1A1AA">São Paulo · Corinthians · Palmeiras · Santos</text>
+
+  <rect x="80" y="600" width="1040" height="3" rx="1.5" fill="#26262E"/>
+</svg>

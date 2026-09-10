@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280" role="img" aria-label="Capa do corte">
+  <defs>
+    <linearGradient id="bgv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1C1C23"/>
+      <stop offset="1" stop-color="#0A0A0C"/>
+    </linearGradient>
+    <pattern id="dotsv" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#E07C0A" fill-opacity="0.16"/>
+    </pattern>
+  </defs>
+  <rect width="720" height="1280" fill="url(#bgv)"/>
+  <rect width="720" height="1280" fill="url(#dotsv)"/>
+  <circle cx="560" cy="300" r="240" fill="#E07C0A" fill-opacity="0.07"/>
+  <rect x="200" y="560" width="320" height="112" rx="24" fill="#E07C0A"/>
+  <text x="360" y="638" font-family="'Segoe UI', system-ui, sans-serif" font-size="70" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">VAR</text>
+  <text x="360" y="722" font-family="'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="700" fill="#A1A1AA" text-anchor="middle" letter-spacing="5">CORTE VERTICAL</text>
+</svg>

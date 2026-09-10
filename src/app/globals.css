@@ -1,0 +1,600 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* compensa o header fixo ao navegar por ancoras */
+    scroll-padding-top: 92px;
+  }
+
+  body {
+    @apply bg-ink text-white antialiased;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-primary text-ink;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-deep;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-line rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-ink rounded-lg;
+  }
+}
+
+@layer components {
+  /*
+   * Com viewport-fit=cover o conteudo pode passar por baixo do entalhe quando
+   * o telefone esta deitado; o max() garante o recuo so quando ele existe.
+   */
+  .container-page {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  @screen sm {
+    .container-page {
+      padding-left: max(1.5rem, env(safe-area-inset-left));
+      padding-right: max(1.5rem, env(safe-area-inset-right));
+    }
+  }
+
+  @screen lg {
+    .container-page {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
+    }
+  }
+
+  /* Cartao padrao: borda fina + brilho sutil no hover */
+  .card {
+    @apply rounded-2xl border border-ink-line bg-ink-surface transition-all duration-300 ease-smooth;
+  }
+
+  /*
+   * O realce de hover so existe onde ha ponteiro de verdade. No toque, o
+   * estado ":hover" fica grudado depois do toque e o cartao permanece
+   * levantado ate a pessoa tocar em outro lugar.
+   */
+  @media (hover: hover) and (pointer: fine) {
+    .card-hover {
+      @apply hover:border-primary/50 hover:shadow-glow-soft hover:-translate-y-1;
+    }
+  }
+
+  /* No toque, o feedback e imediato e volta sozinho. */
+  @media (hover: none) {
+    .card-hover {
+      @apply active:border-primary/40 active:scale-[0.99];
+    }
+  }
+
+  /*
+   * Alvo minimo de toque (44px) so em telas sem mouse: no desktop a mesma
+   * regra engordaria controles que ja funcionam bem menores.
+   */
+  @media (pointer: coarse) {
+    .toque {
+      min-height: 44px;
+    }
+    /* Link de texto: cresce a area de toque sem alterar o ritmo visual. */
+    .toque-linha {
+      padding-block: 0.75rem;
+      margin-block: -0.75rem;
+    }
+  }
+
+  /*
+   * Dígito que é dado — número do episódio, duração, views, tempo de leitura,
+   * data — usa numeral de largura fixa. Na Plus Jakarta Sans o "1" é bem mais
+   * estreito que o "8": sem isso, "12:08" e "17:44" ocupam larguras diferentes
+   * e a coluna de selos dança de card para card. É a diferença entre um número
+   * escrito e um número medido, que é o que este site diz ser.
+   */
+  .numerico {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ease-smooth active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply btn bg-primary font-extrabold text-ink shadow-glow-soft hover:bg-primary-600 active:bg-primary-700;
+  }
+  .btn-ghost {
+    @apply btn border border-ink-line bg-ink-surface text-zinc-200 hover:border-primary/50 hover:text-white active:bg-ink-elevated;
+  }
+
+  /*
+   * ESCALA TIPOGRÁFICA POR PAPEL
+   *
+   * Existe por dois motivos concretos:
+   *
+   * 1. No Tailwind, um utilitário de tamanho responsivo (`sm:text-4xl`) traz a
+   *    própria line-height junto e sobrescreve um `leading-*` sem prefixo. Foi
+   *    assim que os títulos de seção acabaram com 42px de texto dentro de 40px
+   *    de linha — razão 0,95, com as duas linhas se tocando.
+   * 2. Papel repetido precisa ser idêntico em toda tela. Uma classe nomeada
+   *    pela função garante isso melhor que uma pilha de utilitários reescrita
+   *    em cada componente.
+   *
+   * Texto claro sobre fundo escuro parece mais pesado do que é: por isso o
+   * corpo leva um fio de tracking positivo e entrelinha um pouco maior que o
+   * habitual, e os títulos levam tracking negativo para fechar os vãos que a
+   * caixa alta e o peso 800 abrem.
+   */
+  .t-display {
+    font-size: clamp(1.75rem, 8.5vw, 3.875rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+  }
+
+  .t-page {
+    font-size: clamp(1.75rem, 1.1rem + 3vw, 2.875rem);
+    line-height: 1.08;
+    letter-spacing: -0.027em;
+    font-weight: 800;
+  }
+
+  .t-headline {
+    font-size: clamp(1.625rem, 1.25rem + 1.9vw, 2.375rem);
+    line-height: 1.14;
+    letter-spacing: -0.022em;
+    font-weight: 800;
+  }
+
+  .t-title {
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+    line-height: 1.32;
+    letter-spacing: -0.012em;
+    font-weight: 700;
+  }
+
+  .t-lead {
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.62;
+    letter-spacing: 0.004em;
+  }
+
+  .t-body {
+    font-size: 1rem;
+    line-height: 1.62;
+    letter-spacing: 0.004em;
+  }
+
+  .t-body-sm {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: 0.006em;
+  }
+
+  .t-label {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* Texto denso: rotulo de botao compacto, titulo de corte, bio curta. */
+  .t-compact {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0.006em;
+  }
+
+  .t-micro {
+    font-size: 0.6875rem;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    font-weight: 800;
+  }
+
+  /*
+   * Medida de leitura: o teto que impede a linha de virar régua.
+   *
+   * Em `em`, não em `ch`: a unidade `ch` é a largura do glifo "0", que na Plus
+   * Jakarta Sans mede ~0,73em — muito acima da média das minúsculas (~0,47em).
+   * `54ch` aqui rendia 78 caracteres por linha, não 54.
+   *
+   * Em `rem` e não em `em`: blocos vizinhos da mesma coluna têm tamanhos de
+   * fonte diferentes (cabeçalho a 16px, corpo do artigo a 18px), e uma medida
+   * relativa ao próprio texto daria larguras distintas — as bordas esquerdas
+   * deixariam de bater. 36rem ≈ 61 caracteres a 18px; 28rem ≈ 53.
+   */
+  .medida-prosa {
+    max-width: 36rem;
+  }
+  .medida-apoio {
+    max-width: 28rem;
+  }
+
+  .tag-clube {
+    @apply t-micro inline-flex items-center rounded-md px-2.5 py-1 uppercase;
+  }
+
+  /*
+   * Card da bancada que gira. Adaptado de um card 3D de biblioteca: a mecânica
+   * (perspective + preserve-3d + backface-visibility) é a mesma, a pele é toda
+   * do site — sem gradiente colorido, sem halo branco, sem pulso permanente.
+   *
+   * Vira em três situações, não só no hover: hover com mouse, foco de teclado,
+   * e toque (via data-virado). Sem isso o verso seria inalcançável no celular,
+   * que é o cenário principal deste site.
+   */
+  .flip {
+    perspective: 1200px;
+  }
+
+  .flip-inner {
+    @apply relative h-full w-full transition-transform duration-700 ease-smooth;
+    transform-style: preserve-3d;
+  }
+
+  .flip[data-virado='true'] .flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .flip:hover .flip-inner,
+    .flip:focus-within .flip-inner {
+      transform: rotateY(180deg);
+    }
+  }
+
+  .face {
+    @apply absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-ink-line;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .face-verso {
+    transform: rotateY(180deg);
+  }
+
+  /* Carrossel horizontal com snap, sensivel ao toque no mobile */
+  .swiper-row {
+    @apply flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [-webkit-overflow-scrolling:touch];
+  }
+  .swiper-item {
+    @apply snap-start shrink-0;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ============================== MOVIMENTO ==============================
+ *
+ * Momento focal: as camisas sendo escritas no topo. A faixa das quatro
+ * camisas entra listra por listra, da esquerda para a direita, e os quatro
+ * cards abaixo repetem a mesma ordem logo em seguida — duas cascatas
+ * encadeadas que o olho lê como um gesto só descendo pela página. Os atrasos
+ * saem de `ATRASO_FAIXA` e `ATRASO_CARD`, no Hero.
+ *
+ * As faixas continuam existindo fora do topo (cards da bancada), aí com
+ * `--faixa-atraso: 0ms`, como entrada local e não como momento focal.
+ *
+ * Os feixes de luz do topo (`FeixesHero`) são ambiente, não momento: pintam em
+ * canvas, param fora da tela e ficam parados em movimento reduzido.
+ *
+ * Orçamento: só `transform` e `opacity`, ambos no compositor. A entrada por
+ * rolagem usa `animation-timeline: view()`, que roda fora do main thread e
+ * não custa listener de scroll. Onde o navegador não suporta, o conteúdo
+ * simplesmente já nasce visível — o padrão é o estado final, nunca o oculto.
+ */
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes revelar-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes preencher-faixa {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Quanto do artigo já foi lido. Escala, não largura: roda no compositor. */
+@keyframes preencher-leitura {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+
+@layer components {
+  /*
+   * Entrada por rolagem. O estado padrão é visível: se o navegador não
+   * entender `animation-timeline`, nada acontece e o conteúdo está lá.
+   */
+  .revelar {
+    opacity: 1;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .revelar {
+        animation: revelar-entrada linear both;
+        animation-timeline: view();
+        animation-range: entry 4% cover 22%;
+      }
+    }
+  }
+
+  /*
+   * A faixa da camisa: cada tira entra da esquerda, uma depois da outra.
+   * O atraso é curto de propósito — o conjunto inteiro fecha em 340ms.
+   */
+  .faixa-clube {
+    /*
+     * Atraso base da faixa inteira. No topo cada card recebe o seu, para a
+     * camisa ser escrita no instante em que o traço passa pela crista daquele
+     * clube. Fora do topo (cards da bancada) fica 0ms e nada muda.
+     */
+    --faixa-atraso: 0ms;
+  }
+
+  .faixa-clube > span {
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faixa-clube > span {
+      animation: preencher-faixa 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: var(--faixa-atraso);
+    }
+    .faixa-clube > span:nth-child(2) {
+      animation-delay: calc(var(--faixa-atraso) + 70ms);
+    }
+    .faixa-clube > span:nth-child(3) {
+      animation-delay: calc(var(--faixa-atraso) + 140ms);
+    }
+  }
+
+  /*
+   * Barra de leitura do artigo. Sem JavaScript: `animation-timeline: scroll()`
+   * amarra o preenchimento à rolagem da página e roda fora do main thread, sem
+   * listener nenhum. Nasce escondida e só aparece onde o navegador entende a
+   * timeline — uma barra de progresso travada em zero seria pior que nenhuma.
+   */
+  .progresso-leitura {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    display: none;
+    height: 2px;
+    transform-origin: left center;
+    background: linear-gradient(
+      90deg,
+      theme('colors.primary.700'),
+      theme('colors.primary.DEFAULT') 60%,
+      theme('colors.primary.300')
+    );
+  }
+
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .progresso-leitura {
+        display: block;
+        animation: preencher-leitura linear both;
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+
+  /*
+   * Trilho de posição do carrossel no celular, onde não há setas. O polegar
+   * mostra o quanto da faixa está visível e onde ela está — a mesma informação
+   * que as setas desabilitadas dão no desktop.
+   *
+   * `left` e `width` em vez de transform: são 3px de altura atualizados por
+   * rAF, o custo de layout é irrelevante e o cálculo fica legível.
+   */
+  .trilho-posicao {
+    @apply relative h-[3px] w-full overflow-hidden rounded-full bg-ink-line;
+  }
+  /* Sem transição: o valor já é atualizado a cada quadro pela rolagem. Uma
+     transição aqui brigaria com o dedo e ficaria arrastando atrás dele. */
+  .trilho-posicao > span {
+    @apply absolute inset-y-0 rounded-full bg-primary;
+  }
+
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .divider-glow {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(224, 124, 10, 0.45),
+      transparent
+    );
+  }
+}
+
+/*
+ * Conteudo do artigo renderizado a partir do Markdown.
+ * 16px e o piso de leitura no celular; a partir de 640px sobe para 18px,
+ * porque a coluna e a superficie de leitura do site.
+ */
+.article-body {
+  font-size: 1rem;
+  line-height: 1.75;
+  letter-spacing: 0.004em;
+  @apply text-zinc-300;
+}
+@screen sm {
+  .article-body {
+    font-size: 1.125rem;
+    line-height: 1.72;
+  }
+}
+.article-body > * + * {
+  @apply mt-6;
+}
+/* Mais espaco acima de um titulo do que abaixo: o titulo pertence ao que vem. */
+.article-body h2 {
+  @apply mt-14 font-extrabold leading-[1.18] tracking-[-0.022em] text-white;
+  font-size: clamp(1.625rem, 1.4rem + 1vw, 1.875rem);
+}
+.article-body h2 + * {
+  @apply mt-4;
+}
+.article-body h3 {
+  @apply mt-10 text-xl font-bold leading-[1.3] tracking-[-0.012em] text-white;
+}
+.article-body h3 + * {
+  @apply mt-3;
+}
+.article-body a {
+  @apply font-semibold text-primary underline underline-offset-4 hover:text-primary-300;
+}
+.article-body strong {
+  @apply font-bold text-white;
+}
+.article-body ul {
+  @apply list-disc space-y-2 pl-5 marker:text-primary;
+}
+.article-body ol {
+  @apply list-decimal space-y-2 pl-5 marker:text-primary;
+}
+.article-body blockquote {
+  @apply rounded-r-xl border-l border-primary bg-ink-surface/70 px-5 py-4 text-zinc-200;
+}
+.article-body hr {
+  @apply my-10 border-ink-line;
+}
+.article-body code {
+  @apply rounded bg-ink-elevated px-1.5 py-0.5 text-[0.9em] text-primary-300;
+}
+
+/*
+ * MOVIMENTO REDUZIDO
+ *
+ * Movimento reduzido não é ausência de movimento: é menos deslocamento no
+ * espaço, com o retorno que confirma uma ação preservado. O bloco anterior
+ * zerava toda transição com !important — e junto levava o realce de hover, a
+ * troca de cor do botão pressionado e o próprio giro do card da bancada, que
+ * é como a pessoa descobre o verso.
+ *
+ * Aqui: nada mais entra deslizando, o card não sobe, o giro 3D vira uma troca
+ * de opacidade — e cor, borda e foco continuam respondendo.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Entradas param de se deslocar, mas ainda aparecem. */
+  .animate-fade-up,
+  .revelar {
+    animation: aparecer 240ms ease-out both;
+  }
+
+  .faixa-clube > span {
+    animation: none;
+    transform: none;
+  }
+
+  /*
+   * O traço de sinal não precisa de regra aqui: desenho, nós e pulso só ganham
+   * animação dentro de `no-preference`, então o padrão já é a onda inteira
+   * parada. O cabeçote de leitura fica — ele responde ao mouse da pessoa, é
+   * feedback direto, não movimento decorativo.
+   */
+
+  /* O card da bancada troca de face sem girar. */
+  .flip-inner {
+    transition: none;
+  }
+  .flip[data-virado='true'] .flip-inner,
+  .flip:hover .flip-inner,
+  .flip:focus-within .flip-inner {
+    transform: none;
+  }
+  .flip[data-virado='true'] .face:not(.face-verso) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .face-verso {
+    transform: none;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+  .flip[data-virado='true'] .face-verso {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .flip:hover .face:not(.face-verso),
+    .flip:focus-within .face:not(.face-verso) {
+      opacity: 0;
+    }
+    .flip:hover .face-verso,
+    .flip:focus-within .face-verso {
+      opacity: 1;
+    }
+  }
+
+  /* Sem deslocamento no hover; a borda continua respondendo. */
+  .card-hover:hover {
+    transform: none;
+  }
+
+  .btn:active {
+    transform: none;
+  }
+}

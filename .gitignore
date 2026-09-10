@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+build
+.DS_Store
+*.pem
+npm-debug.log*
+.env*.local
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+
+# Rascunhos de sessao das ferramentas de design (prints e logs, nao sao do site)
+.impeccable/questions
+.impeccable/review
