@@ -90,7 +90,7 @@ export default function PostPage({ params }: Params) {
           Voltar para o blog
         </Link>
 
-        <header className="medida-prosa mx-auto mt-8">
+        <header className="medida-titulo mx-auto mt-8">
           <div className="flex flex-wrap items-center gap-3">
             <span className={`tag-clube ${clube.classe}`}>{post.clube}</span>
             <span className="text-xs font-medium text-muted">
@@ -102,7 +102,7 @@ export default function PostPage({ params }: Params) {
             {post.title}
           </h1>
 
-          <p className="t-lead mt-5 text-muted">
+          <p className="t-lead medida-prosa mt-5 text-muted">
             {post.excerpt}
           </p>
 

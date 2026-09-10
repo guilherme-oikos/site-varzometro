@@ -152,9 +152,14 @@
     font-weight: 800;
   }
 
+  /*
+   * 1.08 era proporção de título de uma linha só. Título de página quase sempre
+   * quebra em duas, três ou quatro linhas, e a 46px isso deixava as linhas
+   * quase se tocando. 1.16 abre o suficiente para respirar sem soltar o bloco.
+   */
   .t-page {
     font-size: clamp(1.75rem, 1.1rem + 3vw, 2.875rem);
-    line-height: 1.08;
+    line-height: 1.16;
     letter-spacing: -0.027em;
     font-weight: 800;
   }
@@ -230,6 +235,27 @@
   }
   .medida-apoio {
     max-width: 28rem;
+  }
+
+  /*
+   * Medida de TÍTULO, e não de leitura.
+   *
+   * Medida se conta em caracteres por linha, não em pixels — e um título de
+   * 46px numa coluna calibrada para corpo de 18px rende 20 caracteres por
+   * linha. O título do artigo quebrava em quatro linhas dentro de 576px
+   * enquanto sobrava espaço vazio dos dois lados.
+   *
+   * 56rem devolve ~31 caracteres por linha, dentro da faixa saudável para
+   * display (25 a 40), e é a mesma largura da capa logo abaixo: o bloco do
+   * cabeçalho e a imagem passam a dividir as mesmas bordas em vez de serem
+   * dois retângulos centralizados de larguras diferentes.
+   *
+   * O subtítulo NÃO acompanha: a 18px, 56rem daria mais de 100 caracteres por
+   * linha. Ele fica em `medida-prosa` dentro do cabeçalho — manchete larga,
+   * linha fina embaixo, alinhadas pela esquerda. É o padrão editorial.
+   */
+  .medida-titulo {
+    max-width: 56rem;
   }
 
   .tag-clube {
