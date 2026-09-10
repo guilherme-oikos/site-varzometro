@@ -4,8 +4,8 @@ excerpt: 'Análise da derrota do Tricolor por 1 a 0 nas quartas da Sul-Americana
 date: '2026-09-10'
 author: 'GJ'
 clube: 'SPFC'
-cover: '/blog/boca-x-sao-paulo-calleri.jpg'
-coverAlt: 'Calleri com a bola dominada durante Boca Juniors x São Paulo, na Bombonera'
+cover: '/blog/boca-juniors-x-sao-paulo-sul-americana-2026.jpg'
+coverAlt: 'Jogadores do São Paulo lamentam com as mãos na cabeça durante a derrota para o Boca Juniors na Bombonera'
 tags: ['sul-americana', 'análise', 'mata-mata']
 ---
 
