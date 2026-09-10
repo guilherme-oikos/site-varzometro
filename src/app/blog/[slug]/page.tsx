@@ -107,9 +107,26 @@ export default function PostPage({ params }: Params) {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4 border-y border-ink-line py-5">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/15 text-xs font-extrabold text-primary">
-              {post.author.slice(0, 2).toUpperCase()}
-            </span>
+            {/*
+              `alt=""` de propósito: o nome do autor está escrito ao lado, em
+              texto. Descrever a foto de novo faria o leitor de tela anunciar a
+              mesma pessoa duas vezes seguidas.
+            */}
+            {post.autorFoto ? (
+              <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-ink-line">
+                <Image
+                  src={post.autorFoto}
+                  alt=""
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                />
+              </span>
+            ) : (
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-xs font-extrabold text-primary">
+                {post.autorIniciais}
+              </span>
+            )}
 
             <span className="text-sm">
               <span className="block font-bold text-white">{post.author}</span>

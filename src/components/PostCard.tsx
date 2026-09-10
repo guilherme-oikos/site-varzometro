@@ -76,9 +76,21 @@ export default function PostCard({ post }: { post: PostMeta }) {
 
         <div className="mt-6 flex items-center justify-between gap-3 border-t border-ink-line pt-5">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-[11px] font-extrabold text-primary">
-              {post.author.slice(0, 2).toUpperCase()}
-            </span>
+            {post.autorFoto ? (
+              <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-ink-line">
+                <Image
+                  src={post.autorFoto}
+                  alt=""
+                  fill
+                  sizes="32px"
+                  className="object-cover"
+                />
+              </span>
+            ) : (
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-extrabold text-primary">
+                {post.autorIniciais}
+              </span>
+            )}
             <span className="text-xs">
               <span className="block font-semibold text-zinc-200">
                 {post.author}

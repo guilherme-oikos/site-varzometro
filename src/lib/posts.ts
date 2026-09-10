@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import type { ClubeSigla } from '@/lib/site';
+import { bancada } from '@/lib/site';
 import { publicFileExists } from '@/lib/media';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
@@ -50,6 +51,16 @@ export type PostMeta = {
    * prévia de compartilhamento usa `OG_PADRAO` em vez do SVG.
    */
   capaPadrao: boolean;
+  /**
+   * Foto do autor, quando ele é da bancada e o arquivo existe em /public.
+   *
+   * Resolvida aqui, e não no componente: `PostCard` é renderizado dentro de
+   * `BlogList`, que é 'use client'. Checar existência de arquivo lá dentro
+   * puxaria `fs` para o bundle do navegador e quebraria o build.
+   */
+  autorFoto?: string;
+  /** Iniciais para quando não há foto. Vêm da bancada; se o autor for de fora, são derivadas do nome. */
+  autorIniciais: string;
   tags: string[];
   readingTime: string;
 };
@@ -74,6 +85,19 @@ function formatDate(date: string): string {
   }).format(new Date(date));
 }
 
+/**
+ * Iniciais de quem não está na bancada (autor convidado, ou nome digitado
+ * diferente no cabeçalho). Duas palavras viram duas iniciais; uma palavra vira
+ * as duas primeiras letras.
+ */
+function iniciaisDoNome(nome: string): string {
+  const partes = nome.trim().split(/s+/).filter(Boolean);
+  if (partes.length >= 2) {
+    return (partes[0][0] + partes[1][0]).toUpperCase();
+  }
+  return nome.trim().slice(0, 2).toUpperCase();
+}
+
 function readPostFile(fileName: string): Post {
   const slug = fileName.replace(/\.mdx?$/, '');
   const raw = fs.readFileSync(path.join(POSTS_DIR, fileName), 'utf8');
@@ -89,6 +113,9 @@ function readPostFile(fileName: string): Post {
   const capaDeclarada = publicFileExists(declarada) ? declarada : undefined;
   const reserva = publicFileExists(CAPA_PADRAO) ? CAPA_PADRAO : undefined;
 
+  const autor = String(data.author ?? 'Bancada VARzômetro');
+  const integrante = bancada.find((membro) => membro.nome === autor);
+
   const capa = capaDeclarada ?? reserva;
   const capaPadrao = Boolean(capa) && capa === reserva;
 
@@ -98,12 +125,14 @@ function readPostFile(fileName: string): Post {
     excerpt: String(data.excerpt ?? ''),
     date: String(data.date ?? new Date().toISOString().slice(0, 10)),
     dateLabel: formatDate(String(data.date ?? new Date().toISOString())),
-    author: String(data.author ?? 'Bancada VARzômetro'),
+    author: autor,
     clube: (data.clube ?? 'SPFC') as ClubeSigla,
     cover: capa,
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,
     capaPadrao,
+    autorFoto: publicFileExists(integrante?.foto) ? integrante?.foto : undefined,
+    autorIniciais: integrante?.iniciais ?? iniciaisDoNome(autor),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     readingTime: calcReadingTime(content),
     content,
