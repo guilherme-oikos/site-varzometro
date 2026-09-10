@@ -134,8 +134,12 @@ topo do arquivo da página.
 
 ## Estado do projeto
 
-- **Ainda não é um repositório Git.** Deploy na Vercel e a publicação de artigos
-  dependem de subir para o GitHub.
+- **Repositório:** https://github.com/guilherme-oikos/site-varzometro (branch
+  `main`). Publicar artigo = commit em `content/posts/`; a Vercel republica
+  sozinha a cada push. O passo a passo para o cliente está em `PUBLICAR.md`.
+- **Deploy na Vercel: ainda não conectado.** Falta importar o repositório em
+  vercel.com/new. Até isso acontecer, nada do que subir para o GitHub aparece
+  em um site no ar.
 - **Painel `/admin` (CMS): descartado pelo cliente.** A publicação de artigos
   continua sendo criar um `.md` em `content/posts/`. Não instale um CMS sem ele
   pedir de novo.
