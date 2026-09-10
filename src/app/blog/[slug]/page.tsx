@@ -144,10 +144,19 @@ export default function PostPage({ params }: Params) {
                 className="object-cover"
               />
             </div>
-            {/* Arte de reserva não ganha legenda: ela não descreve este artigo. */}
-            {!post.capaPadrao && post.coverAlt ? (
+            {/*
+              Arte de reserva não ganha legenda: ela não descreve este artigo.
+              O crédito da foto vem depois da legenda, um tom mais apagado — é
+              obrigação de atribuição, não informação que o leitor procura.
+            */}
+            {!post.capaPadrao && (post.coverAlt || post.coverCredito) ? (
               <figcaption className="mt-3 text-center text-xs text-muted">
                 {post.coverAlt}
+                {post.coverCredito ? (
+                  <span className="block text-[11px] text-zinc-500 sm:ml-2 sm:inline">
+                    Foto: {post.coverCredito}
+                  </span>
+                ) : null}
               </figcaption>
             ) : null}
           </figure>

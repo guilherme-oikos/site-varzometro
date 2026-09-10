@@ -100,7 +100,10 @@ existe), `posts.ts` cai em `CAPA_PADRAO` (`/blog/capa-padrao.svg`) e marca
 capa some (arte genérica não descreve o artigo) e a prévia de compartilhamento
 usa `OG_PADRAO` (`/og.jpg`) — **nunca o SVG**, porque WhatsApp e Facebook não
 renderizam SVG em prévia de link e o artigo sairia sem imagem. Imagens do blog
-ficam em `public/blog/`. A capa usa `next/image` com `aspect-[16/9]` e
+ficam em `public/blog/`. `coverCredito` é campo separado do `coverAlt` e sai na
+legenda como "Foto: ..." — o alternativo descreve a cena para leitor de tela, o
+crédito é atribuição. **Crédito não é licença:** foto de agência sem contrato é
+risco jurídico do cliente, e isso deve ser dito a ele quando aparecer. A capa usa `next/image` com `aspect-[16/9]` e
 `object-cover`; as imagens do corpo do texto usam `<img>` puro, porque têm
 proporção arbitrária e não podem ser cortadas.
 

@@ -32,13 +32,18 @@ As sete linhas entre os `---` são a única parte que **precisa** estar certa.
 | `tags` | Dois ou três assuntos | Entre colchetes, cada um entre aspas |
 
 **Capa é opcional.** Sem nada, o artigo recebe a arte padrão do VARzômetro. Se
-quiser uma imagem própria, salve em `public/blog/` e acrescente duas linhas ao
-cabeçalho:
+quiser uma imagem própria, salve em `public/blog/` e acrescente ao cabeçalho:
 
 ```
 cover: '/blog/nome-da-imagem.jpg'
 coverAlt: 'Descrição curta da foto, para quem não enxerga'
+coverCredito: 'Nome do fotógrafo / Agência'
 ```
+
+> ⚠️ **Foto de agência (AFP, Getty, Reuters) ou de site de notícias exige
+> licença paga.** Pôr o crédito identifica o autor, mas **não** autoriza o uso —
+> são coisas diferentes. Sem licença, o seguro é usar foto própria, de banco
+> livre, ou não pôr capa nenhuma: o artigo recebe a arte do VARzômetro sozinho.
 
 ---
 

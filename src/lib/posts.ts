@@ -35,6 +35,16 @@ export type PostMeta = {
   /** Texto alternativo da capa, para leitores de tela. Cai no título se vazio. */
   coverAlt?: string;
   /**
+   * Crédito da foto (ex.: 'Juan Mabromata / AFP'). Aparece junto da legenda, na
+   * página do artigo. Fica separado do `coverAlt` de propósito: o alternativo
+   * descreve a cena para quem não enxerga, e ouvir o nome do fotógrafo no meio
+   * da descrição não ajuda ninguém.
+   *
+   * Crédito não substitui licença. Foto de agência (AFP, Getty, Reuters) exige
+   * contrato — ver README.
+   */
+  coverCredito?: string;
+  /**
    * A capa é a arte de reserva, e não uma imagem daquele artigo. Muda duas
    * coisas: a legenda embaixo da capa some (arte genérica não é legenda), e a
    * prévia de compartilhamento usa `OG_PADRAO` em vez do SVG.
@@ -92,6 +102,7 @@ function readPostFile(fileName: string): Post {
     clube: (data.clube ?? 'SPFC') as ClubeSigla,
     cover: capa,
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
+    coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,
     capaPadrao,
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     readingTime: calcReadingTime(content),

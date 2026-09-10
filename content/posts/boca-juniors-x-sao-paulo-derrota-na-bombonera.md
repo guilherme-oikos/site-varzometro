@@ -6,6 +6,7 @@ author: 'GJ'
 clube: 'SPFC'
 cover: '/blog/boca-juniors-x-sao-paulo-sul-americana-2026.jpg'
 coverAlt: 'Jogadores do São Paulo lamentam com as mãos na cabeça durante a derrota para o Boca Juniors na Bombonera'
+coverCredito: 'Juan Mabromata / AFP'
 tags: ['sul-americana', 'análise', 'mata-mata']
 ---
 

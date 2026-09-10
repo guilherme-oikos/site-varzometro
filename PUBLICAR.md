@@ -78,9 +78,17 @@ negritos com `**duas estrelinhas**`. A cola completa está no fim do modelo.
 Sem capa, o artigo recebe a arte padrão do VARzômetro automaticamente. Só mexa
 nisso se tiver uma imagem específica para aquele texto.
 
+> ⚠️ **Cuidado com foto de jogo.** Imagem de agência (AFP, Getty, Reuters) ou
+> copiada de site de notícias é paga, e essas empresas cobram de quem usa sem
+> licença. **Pôr o crédito não resolve** — crédito diz quem tirou, licença é a
+> permissão de publicar.
+>
+> Sem licença, as opções seguras são: foto tirada por vocês, imagem de banco
+> livre, ou nenhuma capa (o artigo ganha a arte do VARzômetro).
+
 ### 6. Suba para o ar
 
-Aqui vem a parte que **ainda não está pronta** — leia a seção abaixo.
+É o passo que faz o artigo existir de verdade — leia a seção abaixo.
 
 ---
 
@@ -105,13 +113,13 @@ você edita o arquivo  →  envia para o GitHub  →  a Vercel percebe
                       →  publica de novo  →  no ar (cerca de 1 minuto)
 ```
 
-O único passo manual é enviar para o GitHub. E **hoje ele não existe**: o projeto
-ainda não está no GitHub, então não há caminho nenhum entre esta pasta e um site
-no ar.
+O único passo manual é o de enviar para o GitHub. E é simples: tudo pelo
+navegador, sem programa e sem terminal.
 
-### Depois que o GitHub estiver configurado
+### Publicando pelo GitHub
 
-Aí fica simples de verdade, e tudo pelo navegador — sem programa, sem terminal:
+O repositório é **github.com/guilherme-oikos/site-varzometro** e o site no ar é
+**varzometropodcast.vercel.app**.
 
 1. Entre no repositório no `github.com`
 2. Abra a pasta `content/posts`
