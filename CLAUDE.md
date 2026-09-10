@@ -147,8 +147,13 @@ topo do arquivo da página.
   O site está rodando pelo caminho sem chave.
 - Capas em `public/episodios/` e `public/cortes/` são provisórias e só aparecem
   quando um corte não tem `youtubeId`.
-- `site.url` está apontando para um domínio provisório da Vercel e precisa ser
-  atualizado quando o domínio final for definido (afeta SEO, sitemap e Open Graph).
+- **No ar:** https://varzometropodcast.vercel.app — é o valor de `site.url`.
+  Se um domínio próprio for contratado, trocar lá (afeta SEO, sitemap e Open
+  Graph) e configurar o domínio no painel da Vercel.
+- **Avisos de segurança em aberto:** `npm audit` acusa o próprio `next` (14.2.35)
+  e o `postcss`. A Vercel não bloqueia por esses — só bloqueou o
+  `next-mdx-remote@5`, já corrigido. Resolver exige migrar para o Next 16, com
+  quebras de API no App Router; é trabalho à parte, ainda não agendado.
 
 O `README.md` documenta os fluxos operacionais para o cliente: como publicar
 episódio, corte e artigo, e como trocar as imagens.

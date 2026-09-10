@@ -8,7 +8,7 @@ export const site = {
   shortDescription: 'O hub do futebol paulista sem filtro.',
   description:
     'Podcast sobre o futebol paulista feito por quatro torcedores dos 4 grandes de SP. Pré-jogo, pós-jogo, análises e resenha 100% autêntica.',
-  url: 'https://varzometro.vercel.app',
+  url: 'https://varzometropodcast.vercel.app',
   email: 'varzometropodcast@gmail.com',
   locale: 'pt-BR',
   /** Logo oficial (lockup horizontal) e ícone quadrado para favicon. */
