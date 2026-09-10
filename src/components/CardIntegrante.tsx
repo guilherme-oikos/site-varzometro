@@ -97,14 +97,7 @@ export default function CardIntegrante({
           </span>
 
           <span className="relative flex flex-1 flex-col p-5">
-            <span
-              className="tag-clube self-start border"
-              style={{
-                color: clube.corTexto,
-                borderColor: `${clube.cor}55`,
-                backgroundColor: `${clube.cor}14`,
-              }}
-            >
+            <span className={`tag-clube self-start ${clube.classe}`}>
               {membro.clube}
             </span>
 

@@ -40,7 +40,11 @@ export type ClubeSigla = 'SPFC' | 'SCCP' | 'SEP' | 'SFC';
 export type Clube = {
   nome: string;
   torcedor: string;
-  /** Classe do selo com a sigla (SPFC, SCCP...). */
+  /**
+   * Classe do selo com a sigla (SPFC, SCCP...). Fonte única: vale no blog e nos
+   * cards do topo. Antes o topo montava as cores inline e os dois desenhos
+   * divergiam.
+   */
   classe: string;
   /** Cor de destaque do clube, usada em borda, faixa e brilho. */
   cor: string;
@@ -85,7 +89,11 @@ export const clubes: Record<ClubeSigla, Clube> = {
     nome: 'Santos FC',
     torcedor: 'Santista',
     apelido: 'Peixe',
-    classe: 'bg-white text-ink border border-white',
+    // Santos é o único contornado em vez de preenchido. Preto e branco é a
+    // identidade dele e a do Corinthians ao mesmo tempo; distinguir por
+    // preenchido/contornado é mais firme do que por tom de cinza. E um pill
+    // branco sólido sobre fundo grafite pesa mais que os outros três.
+    classe: 'bg-[#D4D4D8]/10 text-[#D4D4D8] border border-[#D4D4D8]/35',
     cor: '#D4D4D8',
     corTexto: '#D4D4D8',
     faixas: ['#FFFFFF', '#0B0B0B', '#FFFFFF'],

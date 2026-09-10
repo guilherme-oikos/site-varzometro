@@ -148,16 +148,12 @@ export default function Hero() {
                   />
 
                   <div className="relative p-5 sm:p-6">
-                    <span
-                      className="tag-clube border"
-                      style={{
-                        color: clube.corTexto,
-                        borderColor: `${clube.cor}55`,
-                        backgroundColor: `${clube.cor}14`,
-                      }}
-                    >
-                      {sigla}
-                    </span>
+                    {/*
+                      Mesma classe que o blog usa. Antes daqui saíam cores
+                      inline, e o mesmo clube tinha dois selos diferentes
+                      dependendo da página.
+                    */}
+                    <span className={`tag-clube ${clube.classe}`}>{sigla}</span>
 
                     <p className="t-title mt-4 text-white">
                       {clube.nome}
