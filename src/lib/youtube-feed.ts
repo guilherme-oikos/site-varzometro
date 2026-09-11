@@ -165,11 +165,29 @@ async function idsDaPagina(caminho: 'videos' | 'shorts'): Promise<string[]> {
       next: { revalidate: REVALIDAR },
     },
   );
-  if (!resposta.ok) return [];
+  if (!resposta.ok) {
+    console.warn(
+      `[youtube] página /${caminho} respondeu HTTP ${resposta.status}`,
+    );
+    return [];
+  }
 
   const html = await resposta.text();
   const encontrados = html.match(/"videoId":"[A-Za-z0-9_-]{11}"/g) ?? [];
   const ids = encontrados.map((t) => t.slice(11, -1));
+
+  /*
+   * HTTP 200 sem nenhum ID é o sintoma de bloqueio: o YouTube devolve página de
+   * consentimento ou de verificação em vez da listagem. Acontece com IP de
+   * datacenter (Vercel) e não acontece com IP residencial — foi assim que a
+   * busca passou despercebida como quebrada em produção.
+   */
+  if (ids.length === 0) {
+    console.warn(
+      `[youtube] página /${caminho} veio sem nenhum vídeo (${Math.round(html.length / 1024)}KB). ` +
+        'Provável bloqueio de IP. Configure YOUTUBE_API_KEY.',
+    );
+  }
 
   return [...new Set(ids)];
 }
@@ -226,13 +244,47 @@ async function viaPaginasPublicas(): Promise<ConteudoYoutube | null> {
 
 /* ---------------------------------- Público -------------------------------- */
 
+/*
+ * Qualquer que seja o caminho, o resultado é registrado no log do servidor.
+ *
+ * Isso existe por causa de um incidente real: a busca sem chave parou de
+ * funcionar em produção (bloqueio de IP de datacenter), o site caiu na lista
+ * manual do site.ts e **ninguém percebeu** — porque a queda era silenciosa. O
+ * cliente só notou dias depois, quando um vídeo novo não apareceu.
+ *
+ * Falhar é aceitável; falhar sem deixar rastro não é.
+ */
 export async function buscarConteudoYoutube(): Promise<ConteudoYoutube | null> {
   try {
     if (CHAVE_API) {
       const viaChave = await viaApi();
-      if (viaChave) return viaChave;
+      if (viaChave) {
+        console.log(
+          `[youtube] ok pela API: ${viaChave.episodios.length} episódios, ${viaChave.cortes.length} cortes`,
+        );
+        return viaChave;
+      }
+      console.warn('[youtube] API com chave falhou; tentando páginas públicas');
+    } else {
+      console.warn(
+        '[youtube] sem YOUTUBE_API_KEY. O caminho sem chave é bloqueado por IP ' +
+          'de datacenter e tende a falhar em produção.',
+      );
     }
-    return await viaPaginasPublicas();
+
+    const viaPaginas = await viaPaginasPublicas();
+    if (viaPaginas) {
+      console.log(
+        `[youtube] ok pelas páginas públicas: ${viaPaginas.episodios.length} episódios, ${viaPaginas.cortes.length} cortes`,
+      );
+      return viaPaginas;
+    }
+
+    console.error(
+      '[youtube] nenhum caminho funcionou. O site vai mostrar as listas ' +
+        'manuais do site.ts, que não se atualizam sozinhas.',
+    );
+    return null;
   } catch (erro) {
     console.error('[youtube] falha ao buscar vídeos do canal:', erro);
     return null;

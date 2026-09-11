@@ -83,11 +83,21 @@ a UI esconde o selo quando estão vazios. Capa de corte do TikTok é sempre manu
 (imagem em `public/cortes/`): a plataforma não serve thumbnail por link.
 
 **O feed RSS do YouTube (`/feeds/videos.xml`) está fora do ar** — responde 404 até
-para canais grandes. Não tente usá-lo. Os caminhos que funcionam, verificados:
-API v3 com chave, e o HTML de `youtube.com/channel/<id>/videos` e `/shorts`, de
-onde saem os IDs por regex e os títulos pelo oEmbed público. Para saber se um ID
-é Short sem chave: `youtube.com/shorts/<id>` devolve 200 para Short e 303 para
-vídeo longo.
+para canais grandes. Não tente usá-lo.
+
+**O caminho sem chave não funciona em produção.** Raspar o HTML de
+`youtube.com/channel/<id>/videos` funciona de IP residencial e **falha de IP de
+datacenter** (Vercel): o YouTube devolve 200 com página de consentimento, sem
+nenhum `videoId`. Isso passou despercebido porque foi verificado só da máquina
+local — em produção o site caiu na lista manual do `site.ts` e ficou dias sem
+atualizar, em silêncio. **`YOUTUBE_API_KEY` é obrigatória em produção**, não
+opcional. O caminho sem chave fica como reserva para desenvolvimento local.
+
+Para saber se um ID é Short sem chave: `youtube.com/shorts/<id>` devolve 200 para
+Short e 303 para vídeo longo.
+
+Todo caminho da busca registra no log do servidor qual fonte venceu, ou que caiu
+na reserva. Se o site parar de atualizar de novo, o log da Vercel diz por quê.
 
 **Imagem sozinha em Markdown vem embrulhada em `<p>`.** Renderizar `<figure>` ali
 dentro é HTML inválido e quebra a hidratação do React. Por isso a página do
@@ -143,8 +153,10 @@ topo do arquivo da página.
 - **Painel `/admin` (CMS): descartado pelo cliente.** A publicação de artigos
   continua sendo criar um `.md` em `content/posts/`. Não instale um CMS sem ele
   pedir de novo.
-- `YOUTUBE_API_KEY` é opcional e ainda não foi configurada (ver `.env.example`).
-  O site está rodando pelo caminho sem chave.
+- **`YOUTUBE_API_KEY` ainda não foi configurada na Vercel — e por isso a seção de
+  vídeos está congelada na lista manual.** Ver a armadilha acima: o caminho sem
+  chave não funciona de datacenter. Configurar a chave é o que religa a
+  atualização automática (e traz duração e views de brinde).
 - Capas em `public/episodios/` e `public/cortes/` são provisórias e só aparecem
   quando um corte não tem `youtubeId`.
 - **No ar:** https://varzometropodcast.vercel.app — é o valor de `site.url`.

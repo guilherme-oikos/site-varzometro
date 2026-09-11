@@ -12,10 +12,26 @@ import { cortes as cortesManuais, episodios as episodiosManuais } from '@/lib/si
 export default async function SecaoMidia() {
   const doCanal = await buscarConteudoYoutube();
 
-  const episodios = doCanal?.episodios.length
-    ? doCanal.episodios
-    : episodiosManuais;
-  const cortes = doCanal?.cortes.length ? doCanal.cortes : cortesManuais;
+  const usouReservaEpisodios = !doCanal?.episodios.length;
+  const usouReservaCortes = !doCanal?.cortes.length;
+
+  // A reserva é rede de segurança, não estado normal: se ela entrou, o site
+  // parou de se atualizar sozinho e isso precisa aparecer no log.
+  if (usouReservaEpisodios || usouReservaCortes) {
+    console.warn(
+      '[midia] usando lista manual do site.ts para ' +
+        [
+          usouReservaEpisodios ? 'episódios' : null,
+          usouReservaCortes ? 'cortes' : null,
+        ]
+          .filter(Boolean)
+          .join(' e ') +
+        '. Vídeo novo no canal NÃO vai aparecer sozinho.',
+    );
+  }
+
+  const episodios = usouReservaEpisodios ? episodiosManuais : doCanal!.episodios;
+  const cortes = usouReservaCortes ? cortesManuais : doCanal!.cortes;
 
   return <CarrosselMidia episodios={episodios} cortes={cortes} />;
 }
