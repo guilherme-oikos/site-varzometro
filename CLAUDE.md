@@ -87,8 +87,8 @@ para canais grandes. Não tente usá-lo.
 
 **O caminho sem chave não funciona em produção.** Raspar o HTML de
 `youtube.com/channel/<id>/videos` funciona de IP residencial e **falha de IP de
-datacenter** (Vercel): o YouTube devolve 200 com página de consentimento, sem
-nenhum `videoId`. Isso passou despercebido porque foi verificado só da máquina
+datacenter** (Vercel): o YouTube responde **404** para a página do canal. Cuidado ao ler esse
+404 — ele parece URL errada e não é; a mesma URL abre normal no navegador. Isso passou despercebido porque foi verificado só da máquina
 local — em produção o site caiu na lista manual do `site.ts` e ficou dias sem
 atualizar, em silêncio. **`YOUTUBE_API_KEY` é obrigatória em produção**, não
 opcional. O caminho sem chave fica como reserva para desenvolvimento local.
@@ -98,6 +98,14 @@ Short e 303 para vídeo longo.
 
 Todo caminho da busca registra no log do servidor qual fonte venceu, ou que caiu
 na reserva. Se o site parar de atualizar de novo, o log da Vercel diz por quê.
+
+**Variável de ambiente colada em painel vem com lixo.** O `YOUTUBE_CHANNEL_ID`
+na Vercel veio com caractere invisível grudado; o ID da playlist é derivado dele
+e o Google respondeu `HTTP 400 invalid — Invalid Value`. Despista feio: 400
+parece problema de chave, mas **chave recusada devolve 403**. 400 é requisição
+malformada, ou seja, parâmetro. Por isso `limparVariavel()` aplica trim e tira
+aspas, e o ID do canal é validado contra `UC` + 22 caracteres. Ao adicionar
+variável nova, passe pelo mesmo tratamento.
 
 **Imagem sozinha em Markdown vem embrulhada em `<p>`.** Renderizar `<figure>` ali
 dentro é HTML inválido e quebra a hidratação do React. Por isso a página do
@@ -153,10 +161,9 @@ topo do arquivo da página.
 - **Painel `/admin` (CMS): descartado pelo cliente.** A publicação de artigos
   continua sendo criar um `.md` em `content/posts/`. Não instale um CMS sem ele
   pedir de novo.
-- **`YOUTUBE_API_KEY` ainda não foi configurada na Vercel — e por isso a seção de
-  vídeos está congelada na lista manual.** Ver a armadilha acima: o caminho sem
-  chave não funciona de datacenter. Configurar a chave é o que religa a
-  atualização automática (e traz duração e views de brinde).
+- **`YOUTUBE_API_KEY` configurada na Vercel e funcionando.** A seção de vídeos
+  se atualiza sozinha de novo, com duração e views. Se voltar a congelar, o log
+  do build diz o motivo — ver a armadilha das variáveis abaixo.
 - Capas em `public/episodios/` e `public/cortes/` são provisórias e só aparecem
   quando um corte não tem `youtubeId`.
 - **No ar:** https://varzometropodcast.vercel.app — é o valor de `site.url`.
