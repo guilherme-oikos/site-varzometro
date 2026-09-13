@@ -92,6 +92,33 @@ function formatarViews(bruto: string): string {
 
 /* ------------------------------ Caminho 1: API ----------------------------- */
 
+/*
+ * O Google devolve o motivo da recusa no corpo da resposta, e é ele que resolve
+ * o problema — não o código HTTP sozinho. Os que aparecem na prática:
+ *
+ *   ipRefererBlocked / referrerBlocked -> a chave tem "restrição de aplicativo"
+ *     (site ou IP). Chamada de servidor não manda referenciador e não vem de IP
+ *     fixo, então é recusada. A restrição de aplicativo tem que ser "Nenhuma";
+ *     restringir por API (só YouTube Data API v3) é seguro e não atrapalha.
+ *   accessNotConfigured -> a YouTube Data API v3 não foi ativada no projeto.
+ *   keyInvalid          -> chave errada, truncada ou com espaço sobrando.
+ *   quotaExceeded       -> cota diária estourada (improvável: 2 unidades por
+ *                          atualização, contra 10.000 por dia).
+ */
+async function relatarFalhaApi(resposta: Response, etapa: string) {
+  let motivo = '(sem detalhe)';
+  try {
+    const corpo = await resposta.json();
+    const razoes = corpo?.error?.errors?.map((e: any) => e.reason).join(', ');
+    motivo = `${razoes || ''} — ${corpo?.error?.message ?? ''}`.trim();
+  } catch {
+    /* resposta sem JSON: fica o código HTTP mesmo */
+  }
+  console.error(
+    `[youtube] API recusou em "${etapa}": HTTP ${resposta.status} | ${motivo}`,
+  );
+}
+
 async function viaApi(): Promise<ConteudoYoutube | null> {
   // A playlist de uploads do canal é o próprio ID com "UC" trocado por "UU".
   const playlistUploads = `UU${CANAL_ID.slice(2)}`;
@@ -100,7 +127,10 @@ async function viaApi(): Promise<ConteudoYoutube | null> {
     `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=25&playlistId=${playlistUploads}&key=${CHAVE_API}`,
     { next: { revalidate: REVALIDAR } },
   );
-  if (!lista.ok) return null;
+  if (!lista.ok) {
+    await relatarFalhaApi(lista, 'lista de uploads');
+    return null;
+  }
 
   const dadosLista = await lista.json();
   const ids: string[] = (dadosLista.items ?? [])
@@ -112,7 +142,10 @@ async function viaApi(): Promise<ConteudoYoutube | null> {
     `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics,snippet&id=${ids.join(',')}&key=${CHAVE_API}`,
     { next: { revalidate: REVALIDAR } },
   );
-  if (!detalhes.ok) return null;
+  if (!detalhes.ok) {
+    await relatarFalhaApi(detalhes, 'detalhes dos vídeos');
+    return null;
+  }
 
   const dadosDetalhes = await detalhes.json();
   const episodios: Episodio[] = [];
@@ -166,8 +199,11 @@ async function idsDaPagina(caminho: 'videos' | 'shorts'): Promise<string[]> {
     },
   );
   if (!resposta.ok) {
+    // Em produção isto responde 404: o YouTube nega a página do canal para IP de
+    // datacenter. Não é erro de URL — a mesma URL abre normalmente no navegador.
     console.warn(
-      `[youtube] página /${caminho} respondeu HTTP ${resposta.status}`,
+      `[youtube] página /${caminho} respondeu HTTP ${resposta.status} ` +
+        '(404 aqui = IP bloqueado, não URL errada)',
     );
     return [];
   }
@@ -185,7 +221,7 @@ async function idsDaPagina(caminho: 'videos' | 'shorts'): Promise<string[]> {
   if (ids.length === 0) {
     console.warn(
       `[youtube] página /${caminho} veio sem nenhum vídeo (${Math.round(html.length / 1024)}KB). ` +
-        'Provável bloqueio de IP. Configure YOUTUBE_API_KEY.',
+        'Provável bloqueio de IP.',
     );
   }
 
