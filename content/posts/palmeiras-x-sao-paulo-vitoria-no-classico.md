@@ -4,6 +4,9 @@ excerpt: 'Dois a zero no Choque-Rei, com gols de Murilo e Vitor Roque, e o Verd�
 date: '2026-09-13'
 author: 'Gê'
 clube: 'SEP'
+cover: '/blog/palmeiras-x-sao-paulo-vitor-roque-comemora.jpg'
+coverAlt: 'Vitor Roque comemora gol do Palmeiras no Choque-Rei, com jogadores do São Paulo ao fundo'
+coverCredito: 'Palmeiras'
 tags: ['clássico', 'análise', 'brasileirão']
 ---
 
