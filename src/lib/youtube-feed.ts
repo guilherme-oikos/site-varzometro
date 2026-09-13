@@ -16,8 +16,40 @@ import type { Corte, Episodio } from '@/lib/site';
  * de modo que o site nunca fica sem conteúdo.
  */
 
-const CANAL_ID = process.env.YOUTUBE_CHANNEL_ID ?? 'UCq6n9H-_wGp-W8NZ_KTklhA';
-const CHAVE_API = process.env.YOUTUBE_API_KEY;
+const CANAL_PADRAO = 'UCq6n9H-_wGp-W8NZ_KTklhA';
+
+/**
+ * Tira lixo de colagem de painel: espaço, quebra de linha e aspas em volta.
+ *
+ * Não é paranoia — foi bug real em produção. O `YOUTUBE_CHANNEL_ID` colado na
+ * Vercel veio com caractere invisível grudado, o ID da playlist saiu malformado
+ * e o Google respondeu `HTTP 400 invalid — Invalid Value`. Custou uma tarde,
+ * porque 400 parece erro de chave e não é: chave recusada devolve 403.
+ */
+function limparVariavel(bruto: string | undefined): string | undefined {
+  const limpo = bruto?.trim().replace(/^["']|["']$/g, '').trim();
+  return limpo || undefined;
+}
+
+const CANAL_BRUTO = limparVariavel(process.env.YOUTUBE_CHANNEL_ID);
+
+/*
+ * ID de canal do YouTube é sempre "UC" + 22 caracteres. Se vier fora desse
+ * formato, usar o valor assim só produziria o mesmo 400 — melhor cair no padrão
+ * e dizer por quê.
+ */
+const CANAL_ID = (() => {
+  if (!CANAL_BRUTO) return CANAL_PADRAO;
+  if (/^UC[\w-]{22}$/.test(CANAL_BRUTO)) return CANAL_BRUTO;
+
+  console.warn(
+    `[youtube] YOUTUBE_CHANNEL_ID fora do formato esperado ("${CANAL_BRUTO}"). ` +
+      `Deve ser "UC" + 22 caracteres. Usando o canal padrão do projeto.`,
+  );
+  return CANAL_PADRAO;
+})();
+
+const CHAVE_API = limparVariavel(process.env.YOUTUBE_API_KEY);
 
 /** De quanto em quanto tempo o site procura vídeos novos (em segundos). */
 const REVALIDAR = 3600;
