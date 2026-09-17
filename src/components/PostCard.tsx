@@ -44,17 +44,18 @@ export default function PostCard({ post }: { post: PostMeta }) {
            * Linha do clube fechando a capa. Fica por cima do degradê: a foto
            * continua derretendo no card, e a linha é só a borda nítida embaixo.
            *
-           * Usa `cor`, e não as `faixas` da camisa, porque segmento escuro
+           * Cor única, e não as `faixas` da camisa, porque segmento escuro
            * desaparece sobre o grafite do card — a faixa do Corinthians virava
-           * meia linha branca, como se estivesse quebrada. Por isso também o
-           * Corinthians é branco aqui, e não preto: preto sobre #16161B não
-           * existe. Santos fica no #D4D4D8, um tom abaixo, que é o mesmo
-           * recurso usado para separar os dois nas tags.
+           * meia linha branca, como se estivesse quebrada.
+           *
+           * `corLinha` é um token à parte de `cor` justamente por causa do
+           * Corinthians: aqui ele é cinza escuro, para separar do branco do
+           * Santos, mas segue branco no brilho da bancada e no card do topo.
            */}
           <span
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-[3px]"
-            style={{ backgroundColor: clube.cor }}
+            style={{ backgroundColor: clube.corLinha }}
           />
 
           <span className={`tag-clube absolute left-4 top-4 backdrop-blur-sm ${clube.classe}`}>

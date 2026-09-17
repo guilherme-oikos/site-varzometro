@@ -50,6 +50,13 @@ export type Clube = {
   cor: string;
   /** Cor do clube legivel como texto pequeno sobre grafite (min 4,5:1). */
   corTexto: string;
+  /**
+   * Cor da linha que fecha a capa nos cards do blog. Existe separada de `cor`
+   * porque ali as duas únicas restrições são contrastar com o grafite do card
+   * e não confundir Corinthians com Santos — decisões que não valem para o
+   * brilho da bancada nem para a borda do topo, que continuam usando `cor`.
+   */
+  corLinha: string;
   /** Faixas da camisa/escudo, na ordem em que aparecem no card. */
   faixas: string[];
   /** Apelido curto usado no card do herói. */
@@ -65,6 +72,7 @@ export const clubes: Record<ClubeSigla, Clube> = {
     cor: '#E30613',
     // O vermelho do manto da 3,69:1 a 11px sobre grafite; este clareado da 6,5:1.
     corTexto: '#F05A63',
+    corLinha: '#E30613',
     faixas: ['#E30613', '#FFFFFF', '#0B0B0B'],
   },
   SCCP: {
@@ -74,6 +82,12 @@ export const clubes: Record<ClubeSigla, Clube> = {
     classe: 'bg-[#0B0B0B] text-white border border-white/30',
     cor: '#FFFFFF',
     corTexto: '#FFFFFF',
+    // O preto do Timão não existe sobre o grafite do card. Este cinza dá 3,73:1
+    // contra o card — a mesma presença do vermelho do São Paulo, que é a régua
+    // de "linha que se vê" aqui — e 4,83:1 contra o branco do Santos, que é de
+    // quem ele precisa se diferenciar. Escurecer mais apaga a linha: #52525B
+    // foi testado e sumiu.
+    corLinha: '#71717A',
     faixas: ['#0B0B0B', '#FFFFFF'],
   },
   SEP: {
@@ -83,6 +97,7 @@ export const clubes: Record<ClubeSigla, Clube> = {
     classe: 'bg-clube-sep text-white border border-white/20',
     cor: '#00A868',
     corTexto: '#00A868',
+    corLinha: '#00A868',
     faixas: ['#006437', '#FFFFFF'],
   },
   SFC: {
@@ -96,6 +111,7 @@ export const clubes: Record<ClubeSigla, Clube> = {
     classe: 'bg-[#D4D4D8]/10 text-[#D4D4D8] border border-[#D4D4D8]/35',
     cor: '#D4D4D8',
     corTexto: '#D4D4D8',
+    corLinha: '#FFFFFF',
     faixas: ['#FFFFFF', '#0B0B0B', '#FFFFFF'],
   },
 };
