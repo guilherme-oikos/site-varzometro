@@ -26,10 +26,22 @@ As sete linhas entre os `---` são a única parte que **precisa** estar certa.
 |---|---|---|
 | `title` | O título do artigo | Se tiver aspas simples no texto, use aspas duplas em volta: `title: "O 'craque' sumiu"` |
 | `excerpt` | Resumo de 1 ou 2 linhas | Mesma regra de aspas |
-| `date` | A data no formato `'2026-09-10'` | Sempre ano-mês-dia, com zero na frente: `'2026-03-05'`, nunca `'5/3/2026'` |
+| `date` | A data no formato `'2026-09-10'` | Sempre ano-mês-dia, com zero na frente: `'2026-03-05'`, nunca `'5/3/2026'`. Dois artigos no mesmo dia? Ver abaixo |
 | `author` | `GJ`, `Marti`, `Vinícius` ou `Gê` | Escreva igualzinho, com acento |
 | `clube` | `SPFC`, `SCCP`, `SEP` ou `SFC` | Maiúsculas. São São Paulo, Corinthians, Palmeiras e Santos |
 | `tags` | Dois ou três assuntos | Entre colchetes, cada um entre aspas |
+
+**Dois artigos no mesmo dia.** O blog mostra do mais novo para o mais antigo.
+Se dois textos saírem na mesma data, acrescente a hora no `date` daquele que veio
+depois, para ele ficar na frente:
+
+```
+date: '2026-09-17 15:00'
+```
+
+A hora **não aparece** em lugar nenhum do site — serve só para ordenar. Quem não
+tem hora conta como início do dia. Se só houver um artigo naquela data, deixe a
+data sozinha, como sempre.
 
 **Capa é opcional.** Sem nada, o artigo recebe a arte padrão do VARzômetro. Se
 quiser uma imagem própria, salve em `public/blog/` e acrescente ao cabeçalho:

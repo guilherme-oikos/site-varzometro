@@ -66,7 +66,7 @@ tags: ['análise', 'vila belmiro']
 |---|---|
 | `author` | `GJ` · `Marti` · `Vinícius` · `Gê` |
 | `clube` | `SPFC` (São Paulo) · `SCCP` (Corinthians) · `SEP` (Palmeiras) · `SFC` (Santos) |
-| `date` | Sempre `'ano-mês-dia'` com zero na frente: `'2026-03-05'` |
+| `date` | Sempre `'ano-mês-dia'` com zero na frente: `'2026-03-05'`. Se for o segundo artigo do dia, ponha a hora junto para ele ficar na frente: `'2026-03-05 15:00'` — a hora não aparece no site, só ordena |
 
 ### 4. Cole o texto embaixo
 
@@ -141,7 +141,7 @@ Corrigir um erro de digitação num artigo já publicado segue o mesmo caminho: 
 - [ ] As duas linhas de `---` estão lá, uma no começo e uma no fim do cabeçalho
 - [ ] `author` escrito igualzinho, com acento (`Vinícius`, `Gê`)
 - [ ] `clube` em maiúsculas (`SPFC`, `SCCP`, `SEP`, `SFC`)
-- [ ] `date` no formato `'2026-09-10'`
+- [ ] `date` no formato `'2026-09-10'` (com hora, `'2026-09-10 15:00'`, se já houver outro artigo nesse dia)
 - [ ] Título e resumo entre aspas
 
 ---

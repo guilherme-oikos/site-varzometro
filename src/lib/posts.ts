@@ -76,13 +76,27 @@ function calcReadingTime(content: string): string {
   return `${minutes} min de leitura`;
 }
 
+/**
+ * Normaliza o campo `date` do cabeçalho para texto comparável.
+ *
+ * Aceita `'2026-09-17'` e também `'2026-09-17 15:00'` — a hora é opcional e
+ * serve só para desempatar dois artigos do mesmo dia (ver a ordenação em
+ * getAllPosts). Sem aspas no arquivo, o YAML transforma a data em objeto Date;
+ * por isso o caso é tratado aqui em vez de virar "Thu Sep 17 2026..." na tela.
+ */
+function normalizarData(bruto: unknown): string {
+  if (bruto instanceof Date) return bruto.toISOString().slice(0, 16).replace('T', ' ');
+  return String(bruto ?? new Date().toISOString().slice(0, 10)).trim();
+}
+
+/** Só a parte da data importa na tela: a hora nunca é exibida. */
 function formatDate(date: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
-  }).format(new Date(date));
+  }).format(new Date(date.slice(0, 10)));
 }
 
 /**
@@ -123,8 +137,8 @@ function readPostFile(fileName: string): Post {
     slug,
     title: String(data.title ?? slug),
     excerpt: String(data.excerpt ?? ''),
-    date: String(data.date ?? new Date().toISOString().slice(0, 10)),
-    dateLabel: formatDate(String(data.date ?? new Date().toISOString())),
+    date: normalizarData(data.date),
+    dateLabel: formatDate(normalizarData(data.date)),
     author: autor,
     clube: (data.clube ?? 'SPFC') as ClubeSigla,
     cover: capa,
@@ -139,7 +153,18 @@ function readPostFile(fileName: string): Post {
   };
 }
 
-/** Lista todos os posts publicados, do mais recente para o mais antigo. */
+/**
+ * Lista todos os posts publicados, do mais recente para o mais antigo.
+ *
+ * A comparação é de texto, não de Date: `'2026-09-17 15:00'` vem depois de
+ * `'2026-09-17'` porque é mais longo com o mesmo começo — ou seja, artigo sem
+ * hora conta como início do dia. Isso evita converter fuso horário só para
+ * ordenar, que é onde a data de um artigo muda de dia sozinha.
+ *
+ * O desempate final pelo slug existe para o resultado não depender do algoritmo
+ * de ordenação do Node. A versão anterior nunca devolvia 0 para datas iguais, e
+ * dois artigos do mesmo dia saíam em ordem imprevisível.
+ */
 export function getAllPosts(): Post[] {
   if (!fs.existsSync(POSTS_DIR)) return [];
 
@@ -147,7 +172,7 @@ export function getAllPosts(): Post[] {
     .readdirSync(POSTS_DIR)
     .filter((file) => /\.mdx?$/.test(file))
     .map(readPostFile)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+    .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 }
 
 export function getPostSlugs(): string[] {

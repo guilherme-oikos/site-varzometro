@@ -1,7 +1,7 @@
 ---
 title: 'Carlos Miguel salva Palmeiras em classificação que parecia tranquila'
 excerpt: 'Dois gols da LDU em menos de três minutos jogaram para os pênaltis uma vaga que já estava encaminhada. O goleiro pegou duas e levou o Verdão à 13ª semifinal de Libertadores.'
-date: '2026-09-17'
+date: '2026-09-17 15:00'
 author: 'Gê'
 clube: 'SEP'
 cover: '/blog/palmeiras-x-ldu-classificacao-nos-penaltis.jpg'
