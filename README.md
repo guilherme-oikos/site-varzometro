@@ -87,6 +87,10 @@ Já estão no lugar, geradas a partir da pasta `IDENTIDADE VISUAL` e `FOTOS MEMB
 - `public/logo.png` — lockup oficial sem margens (806×509).
 - `public/icone.png` — versão quadrada usada como favicon.
 - `public/bancada/*.jpg` — fotos dos integrantes em 800×800.
+- `public/autores/*.jpg` — foto de quem escreve no blog sem estar na bancada.
+  Aparece só no avatar do artigo, então 400×400 basta. O perfil fica em
+  `convidados`, no `site.ts` — a lista `bancada` é o que monta a seção da home,
+  e incluir alguém lá daria a ele um card de integrante sem querer.
 - `public/og.jpg` — imagem de compartilhamento (1200×630), feita a partir da capa.
 
 Para trocar qualquer uma, basta substituir o arquivo mantendo o nome. Se apagar uma

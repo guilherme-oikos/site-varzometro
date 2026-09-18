@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import type { ClubeSigla } from '@/lib/site';
-import { bancada } from '@/lib/site';
+import { autoresDoBlog } from '@/lib/site';
 import { publicFileExists } from '@/lib/media';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
@@ -52,14 +52,16 @@ export type PostMeta = {
    */
   capaPadrao: boolean;
   /**
-   * Foto do autor, quando ele é da bancada e o arquivo existe em /public.
+   * Foto do autor, quando ele está em `autoresDoBlog` e o arquivo existe em
+   * /public.
    *
    * Resolvida aqui, e não no componente: `PostCard` é renderizado dentro de
    * `BlogList`, que é 'use client'. Checar existência de arquivo lá dentro
    * puxaria `fs` para o bundle do navegador e quebraria o build.
    */
   autorFoto?: string;
-  /** Iniciais para quando não há foto. Vêm da bancada; se o autor for de fora, são derivadas do nome. */
+  /** Iniciais para quando não há foto. Vêm do perfil do autor; se ele não tiver
+   * perfil cadastrado, são derivadas do nome. */
   autorIniciais: string;
   tags: string[];
   readingTime: string;
@@ -100,12 +102,15 @@ function formatDate(date: string): string {
 }
 
 /**
- * Iniciais de quem não está na bancada (autor convidado, ou nome digitado
+ * Iniciais de quem não tem perfil cadastrado (autor de fora, ou nome digitado
  * diferente no cabeçalho). Duas palavras viram duas iniciais; uma palavra vira
  * as duas primeiras letras.
+ *
+ * O separador é `\s+`, espaço. Já esteve escrito `/s+/`, que divide o nome pela
+ * letra "s": "José Santos" saía como "Jé".
  */
 function iniciaisDoNome(nome: string): string {
-  const partes = nome.trim().split(/s+/).filter(Boolean);
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
   if (partes.length >= 2) {
     return (partes[0][0] + partes[1][0]).toUpperCase();
   }
@@ -128,7 +133,9 @@ function readPostFile(fileName: string): Post {
   const reserva = publicFileExists(CAPA_PADRAO) ? CAPA_PADRAO : undefined;
 
   const autor = String(data.author ?? 'Bancada VARzômetro');
-  const integrante = bancada.find((membro) => membro.nome === autor);
+  // Procura na bancada e nos convidados: quem escreve no blog não é
+  // necessariamente integrante do programa.
+  const perfil = autoresDoBlog.find((pessoa) => pessoa.nome === autor);
 
   const capa = capaDeclarada ?? reserva;
   const capaPadrao = Boolean(capa) && capa === reserva;
@@ -145,8 +152,8 @@ function readPostFile(fileName: string): Post {
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,
     capaPadrao,
-    autorFoto: publicFileExists(integrante?.foto) ? integrante?.foto : undefined,
-    autorIniciais: integrante?.iniciais ?? iniciaisDoNome(autor),
+    autorFoto: publicFileExists(perfil?.foto) ? perfil?.foto : undefined,
+    autorIniciais: perfil?.iniciais ?? iniciaisDoNome(autor),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     readingTime: calcReadingTime(content),
     content,

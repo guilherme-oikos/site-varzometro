@@ -219,6 +219,32 @@ export const bancada: Integrante[] = [
   },
 ];
 
+/**
+ * Quem escreve no blog sem estar na bancada.
+ *
+ * Esta lista existe **separada** de propósito: a seção "A Bancada" na home é
+ * montada a partir de `bancada`, então incluir alguém lá daria a ele um card de
+ * integrante automaticamente. Quem está aqui aparece só como autor de artigo —
+ * foto no avatar, iniciais como reserva e a tag do clube.
+ *
+ * Se um convidado entrar para a bancada, mova o item para `bancada` e acrescente
+ * `papel`, `funcao` e `bio`; os artigos antigos dele continuam funcionando, sem
+ * precisar tocar em arquivo nenhum de `content/posts/`.
+ */
+export type Convidado = Pick<Integrante, 'nome' | 'clube' | 'foto' | 'iniciais'>;
+
+export const convidados: Convidado[] = [
+  {
+    nome: 'Léo',
+    clube: 'SFC',
+    iniciais: 'LE',
+    foto: '/autores/leo.jpg',
+  },
+];
+
+/** Todo mundo que pode assinar um artigo — a bancada mais os convidados. */
+export const autoresDoBlog: Convidado[] = [...bancada, ...convidados];
+
 
 /* -------------------------------- Episódios -------------------------------- */
 

@@ -27,7 +27,7 @@ As sete linhas entre os `---` são a única parte que **precisa** estar certa.
 | `title` | O título do artigo | Se tiver aspas simples no texto, use aspas duplas em volta: `title: "O 'craque' sumiu"` |
 | `excerpt` | Resumo de 1 ou 2 linhas | Mesma regra de aspas |
 | `date` | A data no formato `'2026-09-10'` | Sempre ano-mês-dia, com zero na frente: `'2026-03-05'`, nunca `'5/3/2026'`. Dois artigos no mesmo dia? Ver abaixo |
-| `author` | `GJ`, `Marti`, `Vinícius` ou `Gê` | Escreva igualzinho, com acento |
+| `author` | `GJ`, `Marti`, `Vinícius`, `Gê` ou `Léo` | Escreva igualzinho, com acento. Nome fora da lista funciona, mas sai sem foto — só com as iniciais |
 | `clube` | `SPFC`, `SCCP`, `SEP` ou `SFC` | Maiúsculas. São São Paulo, Corinthians, Palmeiras e Santos |
 | `tags` | Dois ou três assuntos | Entre colchetes, cada um entre aspas |
 
