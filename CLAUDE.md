@@ -166,9 +166,11 @@ topo do arquivo da página.
   do build diz o motivo — ver a armadilha das variáveis abaixo.
 - Capas em `public/episodios/` e `public/cortes/` são provisórias e só aparecem
   quando um corte não tem `youtubeId`.
-- **No ar:** https://varzometropodcast.vercel.app — é o valor de `site.url`.
-  Se um domínio próprio for contratado, trocar lá (afeta SEO, sitemap e Open
-  Graph) e configurar o domínio no painel da Vercel.
+- **No ar:** https://www.varzometro.com.br — é o valor de `site.url`, e afeta
+  canonical, sitemap e Open Graph. **O "www" é intencional:** o domínio sem www
+  responde 308 para o com www, então o com www é o que devolve 200. Se a Vercel
+  passar a servir o apex como principal, trocar o valor junto. O endereço antigo
+  `varzometropodcast.vercel.app` continua respondendo e não deve ser divulgado.
 - **Avisos de segurança em aberto:** `npm audit` acusa o próprio `next` (14.2.35)
   e o `postcss`. A Vercel não bloqueia por esses — só bloqueou o
   `next-mdx-remote@5`, já corrigido. Resolver exige migrar para o Next 16, com

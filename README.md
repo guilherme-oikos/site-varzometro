@@ -287,7 +287,8 @@ exemplo no meio do texto, só para você ver como fica. Pode trocar ou apagar.
 1. Suba o projeto para um repositório no GitHub.
 2. Em <https://vercel.com>, importe o repositório. O framework é detectado sozinho.
 3. Ajuste `site.url` em `src/lib/site.ts` para o domínio final (importante para SEO,
-   sitemap e Open Graph).
+   sitemap e Open Graph). Use a versão que devolve 200, não a que redireciona:
+   hoje é `https://www.varzometro.com.br`, porque o domínio sem www manda para ela.
 
 Nenhuma variável de ambiente é necessária.
 

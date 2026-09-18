@@ -119,7 +119,7 @@ navegador, sem programa e sem terminal.
 ### Publicando pelo GitHub
 
 O repositório é **github.com/guilherme-oikos/site-varzometro** e o site no ar é
-**varzometropodcast.vercel.app**.
+**varzometro.com.br**.
 
 1. Entre no repositório no `github.com`
 2. Abra a pasta `content/posts`

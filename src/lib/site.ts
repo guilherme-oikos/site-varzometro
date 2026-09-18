@@ -8,7 +8,14 @@ export const site = {
   shortDescription: 'O hub do futebol paulista sem filtro.',
   description:
     'Podcast sobre o futebol paulista feito por quatro torcedores dos 4 grandes de SP. Pré-jogo, pós-jogo, análises e resenha 100% autêntica.',
-  url: 'https://varzometropodcast.vercel.app',
+  /*
+   * Com o "www" de propósito: o domínio sem www responde 308 e manda para cá.
+   * Este valor vira canonical, sitemap e og:url, então precisa ser a URL que
+   * devolve 200 — apontar para a que redireciona faz todo rastreador gastar um
+   * salto à toa. Se um dia a Vercel passar a servir o domínio sem www como
+   * principal, é aqui que muda.
+   */
+  url: 'https://www.varzometro.com.br',
   email: 'varzometropodcast@gmail.com',
   locale: 'pt-BR',
   /** Logo oficial (lockup horizontal) e ícone quadrado para favicon. */
