@@ -65,7 +65,7 @@ tags: ['análise', 'vila belmiro']
 | Campo | Valores aceitos |
 |---|---|
 | `author` | `GJ` · `Marti` · `Vinícius` · `Gê` · `Léo` |
-| `clube` | `SPFC` (São Paulo) · `SCCP` (Corinthians) · `SEP` (Palmeiras) · `SFC` (Santos) |
+| `clube` | `SPFC` (São Paulo) · `SCCP` (Corinthians) · `SEP` (Palmeiras) · `SFC` (Santos). Se o texto não for de um clube só — CBF, calendário, arbitragem —, **apague a linha inteira**: o artigo sai com o selo laranja `GERAL` e fica fora do filtro dos clubes |
 | `date` | Sempre `'ano-mês-dia'` com zero na frente: `'2026-03-05'`. Se for o segundo artigo do dia, ponha a hora junto para ele ficar na frente: `'2026-03-05 15:00'` — a hora não aparece no site, só ordena |
 
 ### 4. Cole o texto embaixo

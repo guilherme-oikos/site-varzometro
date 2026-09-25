@@ -28,8 +28,16 @@ As sete linhas entre os `---` são a única parte que **precisa** estar certa.
 | `excerpt` | Resumo de 1 ou 2 linhas | Mesma regra de aspas |
 | `date` | A data no formato `'2026-09-10'` | Sempre ano-mês-dia, com zero na frente: `'2026-03-05'`, nunca `'5/3/2026'`. Dois artigos no mesmo dia? Ver abaixo |
 | `author` | `GJ`, `Marti`, `Vinícius`, `Gê` ou `Léo` | Escreva igualzinho, com acento. Nome fora da lista funciona, mas sai sem foto — só com as iniciais |
-| `clube` | `SPFC`, `SCCP`, `SEP` ou `SFC` | Maiúsculas. São São Paulo, Corinthians, Palmeiras e Santos |
+| `clube` | `SPFC`, `SCCP`, `SEP` ou `SFC` | Maiúsculas. São São Paulo, Corinthians, Palmeiras e Santos. **Apague a linha inteira** se o texto for sobre futebol em geral e não sobre um clube — ver abaixo |
 | `tags` | Dois ou três assuntos | Entre colchetes, cada um entre aspas |
+
+**Artigo que não é de um clube.** Texto sobre regra da CBF, calendário,
+arbitragem no país, dinheiro do futebol — coisas que valem para os quatro. Nesse
+caso **tire a linha `clube` do cabeçalho**. O artigo recebe o selo laranja
+`GERAL`, aparece em "Todos" no blog e não entra no filtro de nenhum clube.
+
+Não escolha um clube "só para preencher": isso joga o artigo para dentro da conta
+daquele time e desequilibra o blog.
 
 **Dois artigos no mesmo dia.** O blog mostra do mais novo para o mais antigo.
 Se dois textos saírem na mesma data, acrescente a hora no `date` daquele que veio

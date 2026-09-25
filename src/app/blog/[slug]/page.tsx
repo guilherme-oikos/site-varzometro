@@ -13,7 +13,7 @@ import {
   getRelatedPosts,
   OG_PADRAO,
 } from '@/lib/posts';
-import { clubes, site } from '@/lib/site';
+import { seloDoArtigo, site } from '@/lib/site';
 
 type Params = { params: { slug: string } };
 
@@ -51,7 +51,7 @@ export default function PostPage({ params }: Params) {
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
 
-  const clube = clubes[post.clube];
+  const selo = seloDoArtigo(post.clube);
   const relacionados = getRelatedPosts(post.slug);
 
   const jsonLd = {
@@ -92,9 +92,9 @@ export default function PostPage({ params }: Params) {
 
         <header className="medida-titulo mx-auto mt-8">
           <div className="flex flex-wrap items-center gap-3">
-            <span className={`tag-clube ${clube.classe}`}>{post.clube}</span>
+            <span className={`tag-clube ${selo.classe}`}>{selo.sigla}</span>
             <span className="text-xs font-medium text-muted">
-              {clube.nome}
+              {selo.nome}
             </span>
           </div>
 

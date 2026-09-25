@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import type { ClubeSigla } from '@/lib/site';
-import { autoresDoBlog } from '@/lib/site';
+import { autoresDoBlog, siglaDeClube } from '@/lib/site';
 import { publicFileExists } from '@/lib/media';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
@@ -30,7 +30,8 @@ export type PostMeta = {
   date: string;
   dateLabel: string;
   author: string;
-  clube: ClubeSigla;
+  /** Clube do artigo. Ausente quando o texto é sobre o futebol como um todo. */
+  clube?: ClubeSigla;
   /** Caminho da capa em /public, já validado (ex.: '/blog/classico.jpg'). */
   cover?: string;
   /** Texto alternativo da capa, para leitores de tela. Cai no título se vazio. */
@@ -147,7 +148,7 @@ function readPostFile(fileName: string): Post {
     date: normalizarData(data.date),
     dateLabel: formatDate(normalizarData(data.date)),
     author: autor,
-    clube: (data.clube ?? 'SPFC') as ClubeSigla,
+    clube: siglaDeClube(data.clube),
     cover: capa,
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,

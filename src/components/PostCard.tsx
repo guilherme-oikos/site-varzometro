@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRightIcon, ClockIcon } from '@/components/Icons';
-import { clubes } from '@/lib/site';
+import { seloDoArtigo } from '@/lib/site';
 import type { PostMeta } from '@/lib/posts';
 
 export default function PostCard({ post }: { post: PostMeta }) {
-  const clube = clubes[post.clube];
+  const selo = seloDoArtigo(post.clube);
 
   /*
    * O anel de foco vai no card, não no link. O link é um overlay
@@ -55,11 +55,11 @@ export default function PostCard({ post }: { post: PostMeta }) {
           <span
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-[3px]"
-            style={{ backgroundColor: clube.corLinha }}
+            style={{ backgroundColor: selo.corLinha }}
           />
 
-          <span className={`tag-clube absolute left-4 top-4 backdrop-blur-sm ${clube.classe}`}>
-            {post.clube}
+          <span className={`tag-clube absolute left-4 top-4 backdrop-blur-sm ${selo.classe}`}>
+            {selo.sigla}
           </span>
         </div>
       ) : null}
@@ -68,10 +68,10 @@ export default function PostCard({ post }: { post: PostMeta }) {
         <div className="flex items-center justify-between gap-3">
           {post.cover ? (
             <span className="t-micro text-muted">
-              {clube.nome}
+              {selo.nome}
             </span>
           ) : (
-            <span className={`tag-clube ${clube.classe}`}>{post.clube}</span>
+            <span className={`tag-clube ${selo.classe}`}>{selo.sigla}</span>
           )}
 
           <span className="t-micro numerico inline-flex items-center gap-1.5 text-muted">

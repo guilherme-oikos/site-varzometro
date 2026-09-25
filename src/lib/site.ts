@@ -123,6 +123,59 @@ export const clubes: Record<ClubeSigla, Clube> = {
   },
 };
 
+/* ---------------------------- Selo do artigo ------------------------------ */
+
+/**
+ * O que o card e o cabeçalho do artigo mostram: o clube, ou o selo geral.
+ *
+ * O selo geral existe porque nem todo artigo é de um clube. Texto sobre regra da
+ * CBF, calendário, arbitragem ou dinheiro do futebol fala dos quatro ao mesmo
+ * tempo, e carimbar um deles fura a regra editorial de equilíbrio do briefing —
+ * o artigo apareceria no filtro de um clube só, e inflaria a conta dele.
+ *
+ * Também fecha um buraco silencioso: antes, cabeçalho sem `clube` virava São
+ * Paulo por omissão, e sigla digitada errada derrubava o build.
+ */
+export type Selo = {
+  sigla: string;
+  nome: string;
+  classe: string;
+  corLinha: string;
+};
+
+const SELO_GERAL: Selo = {
+  sigla: 'GERAL',
+  nome: 'Futebol brasileiro',
+  classe: 'bg-primary/15 text-primary border border-primary/40',
+  /* Acompanha o `primary` do tailwind.config.ts — se o laranja mudar, muda aqui. */
+  corLinha: '#E07C0A',
+};
+
+export function seloDoArtigo(sigla?: ClubeSigla): Selo {
+  if (!sigla) return SELO_GERAL;
+  const clube = clubes[sigla];
+  return {
+    sigla,
+    nome: clube.nome,
+    classe: clube.classe,
+    corLinha: clube.corLinha,
+  };
+}
+
+/** Valida a sigla do cabeçalho. Devolve `undefined` para vazio ou inválido. */
+export function siglaDeClube(bruto: unknown): ClubeSigla | undefined {
+  const sigla = String(bruto ?? '')
+    .trim()
+    .toUpperCase();
+  if (!sigla) return undefined;
+  if (sigla in clubes) return sigla as ClubeSigla;
+  console.warn(
+    `[posts] clube "${sigla}" não existe. Use SPFC, SCCP, SEP ou SFC, ` +
+      `ou deixe o campo fora do cabeçalho para o artigo sair como geral.`,
+  );
+  return undefined;
+}
+
 /* --------------------------------- Pilares --------------------------------- */
 
 export const pilares = [
