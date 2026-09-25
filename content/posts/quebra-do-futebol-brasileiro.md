@@ -4,7 +4,7 @@ excerpt: 'A limitação de estrangeiros da CBF, o rombo bilionário dos clubes e
 date: '2026-09-25'
 author: 'Gê'
 cover: '/blog/quebra-do-futebol-brasileiro.jpg'
-coverAlt: 'Montagem com os escudos dos quatro grandes de São Paulo, maços de dinheiro, um aplicativo de apostas bloqueado e um gráfico em queda'
+coverAlt: 'Maços de notas de cem reais ao lado de um celular com um aplicativo de apostas marcado com o símbolo de proibido'
 tags: ['CBF', 'bets', 'opinião']
 ---
 
