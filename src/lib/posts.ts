@@ -153,7 +153,7 @@ function readPostFile(fileName: string): Post {
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,
     capaPadrao,
-    autorFoto: publicFileExists(perfil?.foto) ? perfil?.foto : undefined,
+    autorFoto: [perfil?.fotoBlog, perfil?.foto].find((foto) => publicFileExists(foto)),
     autorIniciais: perfil?.iniciais ?? iniciaisDoNome(autor),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     readingTime: calcReadingTime(content),

@@ -237,6 +237,11 @@ export type Integrante = {
   clube: ClubeSigla;
   bio: string;
   foto?: string;
+  /**
+   * Foto só do avatar do blog, quando deve ser diferente da do card da bancada.
+   * Sem ela, o blog usa `foto`.
+   */
+  fotoBlog?: string;
   iniciais: string;
 };
 
@@ -258,6 +263,7 @@ export const bancada: Integrante[] = [
     iniciais: 'MA',
     bio: 'Argumentação forte, opiniões bem elaboradas e o especialista em gerar os momentos mais marcantes e os cortes do programa.',
     foto: '/bancada/marti.jpg',
+    fotoBlog: '/autores/marti.jpg',
   },
   {
     nome: 'Vinícius',
@@ -291,7 +297,7 @@ export const bancada: Integrante[] = [
  * `papel`, `funcao` e `bio`; os artigos antigos dele continuam funcionando, sem
  * precisar tocar em arquivo nenhum de `content/posts/`.
  */
-export type Convidado = Pick<Integrante, 'nome' | 'clube' | 'foto' | 'iniciais'>;
+export type Convidado = Pick<Integrante, 'nome' | 'clube' | 'foto' | 'fotoBlog' | 'iniciais'>;
 
 export const convidados: Convidado[] = [
   {
