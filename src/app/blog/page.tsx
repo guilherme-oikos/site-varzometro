@@ -21,8 +21,7 @@ export default function BlogPage() {
 
       <div className="container-page relative">
         <h1 className="t-page mt-4 max-w-3xl text-balance text-white">
-          Análises escritas sobre os{' '}
-          <span className="text-primary">4 grandes de SP</span>
+          Blog do <span className="text-primary">VARzômetro</span>
         </h1>
 
         <p className="t-lead medida-apoio mt-5 text-muted">
