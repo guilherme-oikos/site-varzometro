@@ -254,6 +254,7 @@ export const bancada: Integrante[] = [
     iniciais: 'GJ',
     bio: 'O responsável por conduzir o programa, controlar os horários e equilibrar os ânimos quando a discussão esquenta.',
     foto: '/bancada/gj.jpg',
+    fotoBlog: '/autores/gj.jpg',
   },
   {
     nome: 'Marti',
@@ -273,6 +274,7 @@ export const bancada: Integrante[] = [
     iniciais: 'VI',
     bio: 'O dono das visões fora da caixa, das opiniões impopulares e dos debates mais acalorados sobre a rodada.',
     foto: '/bancada/vinicius.jpg',
+    fotoBlog: '/autores/vinicius.jpg',
   },
   {
     nome: 'Gê',
@@ -282,6 +284,7 @@ export const bancada: Integrante[] = [
     iniciais: 'GE',
     bio: 'A paixão à flor da pele, a defesa fervorosa do momento do clube e o combustível para as melhores provocações da mesa.',
     foto: '/bancada/ge.jpg',
+    fotoBlog: '/autores/ge.jpg',
   },
 ];
 
