@@ -62,7 +62,7 @@ export default function Hero() {
           </h1>
 
           <p className="t-lead medida-apoio animate-fade-up mx-auto mt-6 text-balance text-muted [animation-delay:80ms]">
-            Quatro torcedores, quatro visões e nenhuma frescura. O seu pré e
+            Cinco torcedores, cinco visões e nenhuma frescura. O seu pré e
             pós-jogo dos 4 grandes de SP em uma resenha 100% autêntica entre
             amigos.
           </p>

@@ -7,7 +7,7 @@ export const site = {
   name: 'VARzômetro',
   shortDescription: 'O hub do futebol paulista sem filtro.',
   description:
-    'Podcast sobre o futebol paulista feito por quatro torcedores dos 4 grandes de SP. Pré-jogo, pós-jogo, análises e resenha 100% autêntica.',
+    'Podcast sobre o futebol paulista feito por cinco torcedores dos 4 grandes de SP. Pré-jogo, pós-jogo, análises e resenha 100% autêntica.',
   /*
    * Com o "www" de propósito: o domínio sem www responde 308 e manda para cá.
    * Este valor vira canonical, sitemap e og:url, então precisa ser a URL que

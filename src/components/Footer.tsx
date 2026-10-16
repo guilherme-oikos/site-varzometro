@@ -31,7 +31,7 @@ export default function Footer() {
             <Logo className="h-12 sm:h-14" />
 
             <p className="t-body-sm mt-5 max-w-sm text-muted">
-              O hub da resenha do futebol paulista. Quatro torcedores, quatro
+              O hub da resenha do futebol paulista. Cinco torcedores, cinco
               visões e nenhuma frescura — do pré-jogo ao pós-jogo dos 4 grandes
               de SP.
             </p>
