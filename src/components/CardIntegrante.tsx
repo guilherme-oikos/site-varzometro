@@ -75,7 +75,7 @@ export default function CardIntegrante({
               className="t-micro mt-2 block uppercase"
               style={{ color: clube.corTexto }}
             >
-              {membro.clube} · {clube.torcedor}
+              {membro.clube}
             </span>
           </span>
         </span>
