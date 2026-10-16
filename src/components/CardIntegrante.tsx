@@ -15,6 +15,10 @@ import { clubes, type Integrante } from '@/lib/site';
  *
  * Vira no hover (mouse), no foco (teclado) e no toque (estado). Um card que só
  * virasse no hover seria um verso inalcançável no celular.
+ *
+ * No celular são dois cards por linha, então tudo encolhe abaixo de `sm`: o
+ * card fica mais alto (3:5) para a bio caber no verso, e a etiqueta do clube
+ * sai do verso — a sigla já está na frente e a faixa do clube no topo.
  */
 export default function CardIntegrante({
   membro,
@@ -28,7 +32,7 @@ export default function CardIntegrante({
 
   return (
     <div
-      className="flip aspect-[3/4] w-full"
+      className="flip aspect-[3/5] w-full sm:aspect-[3/4]"
       data-virado={virado}
       style={{ '--clube': clube.cor } as CSSProperties}
     >
@@ -46,7 +50,7 @@ export default function CardIntegrante({
               src={membro.foto}
               alt=""
               fill
-              sizes="(max-width: 640px) 384px, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 240px"
+              sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 240px"
               className="object-cover"
             />
           ) : (
@@ -67,8 +71,8 @@ export default function CardIntegrante({
             ))}
           </span>
 
-          <span className="relative mt-auto p-5">
-            <span className="block text-xl font-extrabold leading-none text-white">
+          <span className="relative mt-auto p-3 sm:p-5">
+            <span className="block text-base font-extrabold leading-none text-white sm:text-xl">
               {membro.nome}
             </span>
             <span
@@ -96,23 +100,23 @@ export default function CardIntegrante({
             ))}
           </span>
 
-          <span className="relative flex flex-1 flex-col p-5">
-            <span className={`tag-clube self-start ${clube.classe}`}>
+          <span className="relative flex flex-1 flex-col p-3 sm:p-5">
+            <span className={`tag-clube hidden self-start sm:inline-flex ${clube.classe}`}>
               {membro.clube}
             </span>
 
-            <span className="mt-4 block text-lg font-extrabold leading-tight text-white">
+            <span className="block text-[0.95rem] font-extrabold leading-tight text-white sm:mt-4 sm:text-lg">
               {membro.nome}
             </span>
             <span className="t-micro mt-1 block uppercase text-muted">
               {membro.papel}
             </span>
 
-            <span className="t-compact mt-3 block text-muted">
+            <span className="t-compact mt-2 block text-muted max-sm:leading-snug sm:mt-3">
               {membro.bio}
             </span>
 
-            <span className="t-micro mt-auto flex items-center gap-2 border-t border-ink-line pt-4 uppercase text-muted">
+            <span className="t-micro mt-auto flex items-center gap-2 border-t border-ink-line pt-3 uppercase text-muted max-sm:text-[0.625rem] sm:pt-4">
               <BallIcon
                 aria-hidden
                 className="h-3.5 w-3.5 shrink-0"

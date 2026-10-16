@@ -18,15 +18,15 @@ export default function Bancada() {
 
         {/*
           Flex com quebra centralizada em vez de grid: com cinco cards, um grid
-          deixaria o último sozinho encostado à esquerda. Assim fica 1 por linha
-          no celular, 2+2+1 no tablet, 3+2 no notebook e os cinco lado a lado na
+          deixaria o último sozinho encostado à esquerda. Assim fica 2+2+1 no
+          celular e no tablet, 3+2 no notebook e os cinco lado a lado na
           tela grande — a linha incompleta sempre centralizada.
         */}
-        <div className="revelar mt-14 flex flex-wrap justify-center gap-5">
+        <div className="revelar mt-14 flex flex-wrap justify-center gap-3 sm:gap-5">
           {bancada.map((membro) => (
             <div
               key={membro.nome}
-              className="w-full max-w-sm sm:w-[calc((100%-1.25rem)/2)] sm:max-w-none lg:w-[calc((100%-2.5rem)/3)] xl:w-[calc((100%-5rem)/5)]"
+              className="w-full max-w-xs min-[360px]:w-[calc((100%-0.75rem)/2)] min-[360px]:max-w-none sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)] xl:w-[calc((100%-5rem)/5)]"
             >
               <CardIntegrante
                 membro={membro}
