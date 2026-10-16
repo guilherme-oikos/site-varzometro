@@ -277,6 +277,16 @@ export const bancada: Integrante[] = [
     fotoBlog: '/autores/vinicius.jpg',
   },
   {
+    nome: 'Léo',
+    papel: 'Comentarista',
+    funcao: 'A voz da Vila',
+    clube: 'SFC',
+    iniciais: 'LE',
+    bio: 'O santista da mesa. Completa as quatro torcidas e segura a bronca sozinho quando a conversa vira contra o Peixe.',
+    foto: '/bancada/leo.jpg',
+    fotoBlog: '/autores/leo.jpg',
+  },
+  {
     nome: 'Gê',
     papel: 'Comentarista',
     funcao: 'Paixão à flor da pele',
@@ -302,14 +312,7 @@ export const bancada: Integrante[] = [
  */
 export type Convidado = Pick<Integrante, 'nome' | 'clube' | 'foto' | 'fotoBlog' | 'iniciais'>;
 
-export const convidados: Convidado[] = [
-  {
-    nome: 'Léo',
-    clube: 'SFC',
-    iniciais: 'LE',
-    foto: '/autores/leo.jpg',
-  },
-];
+export const convidados: Convidado[] = [];
 
 /** Todo mundo que pode assinar um artigo — a bancada mais os convidados. */
 export const autoresDoBlog: Convidado[] = [...bancada, ...convidados];

@@ -46,7 +46,7 @@ export default function CardIntegrante({
               src={membro.foto}
               alt=""
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+              sizes="(max-width: 640px) 384px, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 240px"
               className="object-cover"
             />
           ) : (
