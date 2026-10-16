@@ -61,10 +61,15 @@ export default function Hero() {
             .
           </h1>
 
+          {/*
+            "VARzômetro Podcast" escrito aqui, no texto de apoio, e não num
+            rótulo acima do H1: é o nome que a pessoa busca, e o buscador quer
+            vê-lo perto do topo. Um rótulo solto mudaria o visual do hero.
+          */}
           <p className="t-lead medida-apoio animate-fade-up mx-auto mt-6 text-balance text-muted [animation-delay:80ms]">
-            Cinco torcedores, cinco visões e nenhuma frescura. O seu pré e
-            pós-jogo dos 4 grandes de SP em uma resenha 100% autêntica entre
-            amigos.
+            Cinco torcedores, cinco visões e nenhuma frescura. O VARzômetro
+            Podcast é o seu pré e pós-jogo dos 4 grandes de SP em uma resenha
+            100% autêntica entre amigos.
           </p>
 
           <div className="animate-fade-up mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center [animation-delay:160ms]">

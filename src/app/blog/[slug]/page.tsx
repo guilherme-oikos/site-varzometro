@@ -8,11 +8,13 @@ import PostCard from '@/components/PostCard';
 import { mdxComponents } from '@/components/MdxComponents';
 import { ArrowLeftIcon, ClockIcon } from '@/components/Icons';
 import {
+  dataIso,
   getAllPosts,
   getPostBySlug,
   getRelatedPosts,
   OG_PADRAO,
 } from '@/lib/posts';
+import type { Post } from '@/lib/posts';
 import { seloDoArtigo, site } from '@/lib/site';
 
 type Params = { params: { slug: string } };
@@ -21,28 +23,55 @@ export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
+/*
+  Imagem do artigo para quem não é leitor: prévia de link e dados estruturados.
+  É a capa, mas só quando é uma capa de verdade. A arte de reserva é SVG, e nem
+  WhatsApp, nem Facebook, nem o Google aceitam SVG nesses lugares: o artigo
+  sairia sem imagem nenhuma. Nesse caso vai a arte do site, em JPG.
+*/
+function imagemDoArtigo(post: Post): string {
+  return post.capaPadrao ? OG_PADRAO : (post.cover ?? OG_PADRAO);
+}
+
+/** Excerpt vazio no cabeçalho não pode virar descrição vazia na busca. */
+function descricaoDoArtigo(post: Post): string {
+  return post.excerpt || `${post.title} — análise da bancada do ${site.name}.`;
+}
+
 export function generateMetadata({ params }: Params): Metadata {
   const post = getPostBySlug(params.slug);
   if (!post) return { title: 'Artigo não encontrado' };
 
+  const descricao = descricaoDoArtigo(post);
+  const imagem = imagemDoArtigo(post);
+  const url = `${site.url}/blog/${post.slug}`;
+
+  /*
+    `openGraph` e `twitter` declarados aqui substituem os do layout por inteiro,
+    sem mesclar. Por isso `siteName` e `locale` são repetidos, e o `twitter`
+    precisa existir: sem ele, o artigo herdava o título e a descrição da home.
+  */
   return {
     title: post.title,
-    description: post.excerpt,
+    description: descricao,
     alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       type: 'article',
+      locale: 'pt_BR',
+      siteName: site.name,
       title: post.title,
-      description: post.excerpt,
-      publishedTime: post.date,
+      description: descricao,
+      publishedTime: dataIso(post.date),
       authors: [post.author],
-      url: `${site.url}/blog/${post.slug}`,
-      /*
-        A capa do artigo é a imagem que aparece ao compartilhar no WhatsApp —
-        mas só quando é uma capa de verdade. A arte de reserva é SVG, e nem
-        WhatsApp nem Facebook renderizam SVG em prévia de link: o artigo sairia
-        sem imagem nenhuma. Nesse caso vai a arte do site, em JPG.
-      */
-      images: [{ url: post.capaPadrao ? OG_PADRAO : (post.cover ?? OG_PADRAO) }],
+      tags: post.tags,
+      url,
+      images: [{ url: imagem, alt: post.coverAlt ?? post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: descricao,
+      images: [imagem],
     },
   };
 }
@@ -54,16 +83,38 @@ export default function PostPage({ params }: Params) {
   const selo = seloDoArtigo(post.clube);
   const relacionados = getRelatedPosts(post.slug);
 
+  const url = `${site.url}/blog/${post.slug}`;
+  const publicado = dataIso(post.date);
+
+  /*
+    BlogPosting é um tipo de Article no schema.org — o Google trata os dois do
+    mesmo jeito e este é o mais exato para texto de blog. Não há data de
+    edição no cabeçalho do .md, então `dateModified` repete a de publicação.
+  */
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
-    description: post.excerpt,
-    datePublished: post.date,
+    description: descricaoDoArtigo(post),
+    image: [`${site.url}${imagemDoArtigo(post)}`],
+    datePublished: publicado,
+    dateModified: publicado,
     inLanguage: 'pt-BR',
+    keywords: post.tags.length > 0 ? post.tags.join(', ') : undefined,
     author: { '@type': 'Person', name: post.author },
-    publisher: { '@type': 'Organization', name: site.name },
-    mainEntityOfPage: `${site.url}/blog/${post.slug}`,
+    publisher: {
+      '@type': 'Organization',
+      name: site.name,
+      url: site.url,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${site.url}${site.logo}`,
+        width: site.logoWidth,
+        height: site.logoHeight,
+      },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    url,
   };
 
   return (
@@ -136,7 +187,7 @@ export default function PostPage({ params }: Params) {
             </span>
 
             <span className="numerico ml-auto flex items-center gap-4 text-xs text-muted">
-              <time dateTime={post.date}>{post.dateLabel}</time>
+              <time dateTime={publicado}>{post.dateLabel}</time>
               <span className="inline-flex items-center gap-1.5">
                 <ClockIcon className="h-3.5 w-3.5" />
                 {post.readingTime}

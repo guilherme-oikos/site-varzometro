@@ -92,6 +92,20 @@ function normalizarData(bruto: unknown): string {
   return String(bruto ?? new Date().toISOString().slice(0, 10)).trim();
 }
 
+/**
+ * Data do artigo em ISO 8601 com o fuso de Brasília, para quem lê máquina:
+ * sitemap, `article:published_time` e o JSON-LD.
+ *
+ * O campo `date` aceita `'2026-09-17'` ou `'2026-09-17 15:00'`, que não são
+ * ISO. Passar isso cru para `new Date()` deixa o fuso por conta do servidor —
+ * na Vercel é UTC, e um artigo das 22h sairia datado do dia seguinte. Sem hora,
+ * vale meio-dia: longe o bastante da meia-noite para nenhum fuso virar o dia.
+ */
+export function dataIso(date: string): string {
+  const [dia, hora = '12:00'] = date.split(' ');
+  return `${dia}T${hora}:00-03:00`;
+}
+
 /** Só a parte da data importa na tela: a hora nunca é exibida. */
 function formatDate(date: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
