@@ -277,16 +277,6 @@ export const bancada: Integrante[] = [
     fotoBlog: '/autores/vinicius.jpg',
   },
   {
-    nome: 'Léo',
-    papel: 'Comentarista',
-    funcao: 'A voz da Vila',
-    clube: 'SFC',
-    iniciais: 'LE',
-    bio: 'O santista da mesa. Completa as quatro torcidas e segura a bronca sozinho quando a conversa vira contra o Peixe.',
-    foto: '/bancada/leo.jpg',
-    fotoBlog: '/autores/leo.jpg',
-  },
-  {
     nome: 'Gê',
     papel: 'Comentarista',
     funcao: 'Paixão à flor da pele',
@@ -295,6 +285,16 @@ export const bancada: Integrante[] = [
     bio: 'A paixão à flor da pele, a defesa fervorosa do momento do clube e o combustível para as melhores provocações da mesa.',
     foto: '/bancada/ge.jpg',
     fotoBlog: '/autores/ge.jpg',
+  },
+  {
+    nome: 'Léo',
+    papel: 'Comentarista',
+    funcao: 'A voz da Vila',
+    clube: 'SFC',
+    iniciais: 'LE',
+    bio: 'O santista da mesa. Completa as quatro torcidas e segura a bronca sozinho quando a conversa vira contra o Peixe.',
+    foto: '/bancada/leo.jpg',
+    fotoBlog: '/autores/leo.jpg',
   },
 ];
 

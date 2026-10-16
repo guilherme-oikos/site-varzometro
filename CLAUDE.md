@@ -136,8 +136,8 @@ sufixo "- VARZÔMETRO #NN".
   Santos) é regra editorial, não estética. Nenhum clube pode receber destaque
   desproporcional — vale para copy, ordem de listas, exemplos e artigos do blog.
   Exceção conhecida e confirmada pelo cliente: a bancada tem cinco integrantes,
-  dois deles palmeirenses (o santista é o Léo). Na ordem dos cards, os quatro
-  clubes aparecem antes de qualquer repetição.
+  dois deles palmeirenses (o santista é o Léo). O Léo fica por último na
+  ordem dos cards, a pedido do cliente.
 - **Tom de voz:** informal, de mesa de bar, direto. Nunca formal, professoral,
   engessado ou didático. Evitar "futebolês" de TV (`box to box` e afins).
 - **Paleta:** laranja `#E07C0A` (`primary`), fundo `#0F0F12` (`ink`), superfície
