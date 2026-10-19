@@ -57,22 +57,41 @@ function palpitesDeMentira(gm: number, gv: number): [number, number][] {
   return [[gm, gv], [gm + 1, gv + 1], [gm, gv + 1], [gm + 2, gv + 1], [gm + 1, gv + 2]];
 }
 
+// Resenha de mentira, para ver como a frase aparece no card.
+const RESENHAS = [
+  'Hoje não tem jeito, é vitória fácil.',
+  'Confio no time até o fim, como sempre.',
+  'Esse aqui é zebra na certa, anota aí.',
+  'Empate com cara de jogo truncado.',
+  'Vai ser sofrido, mas sai o gol no fim.',
+];
+
 /** Palpites de toda a bancada nos jogos simulados que existem em `bolao`. */
 function palpitesSimulados(bolao: Bolao): Palpite[] {
   const autores = [...bolao.ranking].sort((a, b) => a.ordem - b.ordem);
+  const rodadaDe = new Map(bolao.jogos.map((jogo) => [jogo.id, jogo.rodada]));
+  // Uma zebra por pessoa por rodada, como no banco.
+  const zebraUsada = new Set<string>();
   return simulados
-    .filter((s) => bolao.jogos.some((jogo) => jogo.id === s.jogoId))
+    .filter((s) => rodadaDe.has(s.jogoId))
     .flatMap((s, k) => {
       const base = palpitesDeMentira(s.mandante, s.visitante);
       // Gira a faixa a cada jogo, senão a mesma pessoa cravaria todos.
       return autores.map((autor, i) => {
         const [m, v] = base[(i + k * 2) % base.length];
+        const chave = `${autor.autor_id}:${rodadaDe.get(s.jogoId)}`;
+        const dobrado = (i + k) % 2 === 0 && !zebraUsada.has(chave);
+        if (dobrado) zebraUsada.add(chave);
+        const pontosBase = pontos(m, v, s.mandante, s.visitante);
         return {
           jogo_id: s.jogoId,
           autor_id: autor.autor_id,
           gols_mandante: m,
           gols_visitante: v,
-          pontos: pontos(m, v, s.mandante, s.visitante),
+          pontos: pontosBase * (dobrado ? 2 : 1),
+          pontos_base: pontosBase,
+          resenha: (i + k) % 3 === 0 ? RESENHAS[(i + k) % RESENHAS.length] : null,
+          dobrado,
         };
       });
     });
@@ -91,14 +110,15 @@ export function simularBolao(bolao: Bolao): Bolao {
   const extras = palpitesSimulados(bolao);
   const ranking = bolao.ranking
     .map((linha) => {
-      const meus = extras.filter((palpite) => palpite.autor_id === linha.autor_id).map((p) => p.pontos ?? 0);
+      const meus = extras.filter((palpite) => palpite.autor_id === linha.autor_id);
       if (meus.length === 0) return linha;
-      const conta = (n: number) => meus.filter((p) => p === n).length;
+      // Total com a zebra; faixas pela regra, sem ela — como a view do banco.
+      const conta = (n: number) => meus.filter((p) => p.pontos_base === n).length;
       return {
         ...linha,
-        pontos: linha.pontos + meus.reduce((a, b) => a + b, 0),
+        pontos: linha.pontos + meus.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
         exatos: linha.exatos + conta(5),
-        resultados: linha.resultados + meus.filter((p) => p >= 2).length,
+        resultados: linha.resultados + meus.filter((p) => (p.pontos_base ?? 0) >= 2).length,
         jogos_pontuados: linha.jogos_pontuados + meus.length,
         vencedor_e_gols: (linha.vencedor_e_gols ?? 0) + conta(3),
         so_vencedor: (linha.so_vencedor ?? 0) + conta(2),

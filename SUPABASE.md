@@ -106,6 +106,9 @@ nenhum link já compartilhado quebrar.
    Em seguida, do mesmo jeito, [`supabase/migrations/0003_ranking_por_faixa.sql`](supabase/migrations/0003_ranking_por_faixa.sql)
    (as colunas +5 / +3 / +2 / +1 do ranking). Também antes do push: sem ela, a
    tabela do ranking sai com as colunas +3, +2 e +1 vazias.
+   Por último, [`supabase/migrations/0004_resenha_e_zebra.sql`](supabase/migrations/0004_resenha_e_zebra.sql)
+   (resenha no palpite e zebra da rodada). Sem ela o site continua de pé, mas
+   salvar palpite dá "Falta rodar a migração 0004".
 2. Ainda no SQL Editor, grave o segredo da sincronização — **o mesmo valor do
    `CRON_SECRET`** da Vercel:
 

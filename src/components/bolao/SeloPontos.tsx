@@ -1,13 +1,23 @@
 /** "+5", "+3"... ao lado do palpite. Placar exato ganha o laranja cheio; zero fica apagado. */
-export default function SeloPontos({ pontos, compacto = false }: { pontos: number | null; compacto?: boolean }) {
+export default function SeloPontos({
+  pontos,
+  base,
+  compacto = false,
+}: {
+  pontos: number | null;
+  /** Faixa sem a zebra. A cor segue a faixa: um +10 de zebra é um placar exato (+5) dobrado. */
+  base?: number | null;
+  compacto?: boolean;
+}) {
   if (pontos === null) return null;
 
+  const faixa = base ?? pontos;
   const estilo =
-    pontos === 5
+    faixa === 5
       ? 'border-primary bg-primary text-ink'
-      : pontos >= 2
+      : faixa >= 2
         ? 'border-primary/50 text-primary'
-        : pontos === 1
+        : faixa === 1
           ? 'border-ink-line text-zinc-300'
           : 'border-ink-line text-zinc-600';
 

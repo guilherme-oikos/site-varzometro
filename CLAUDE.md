@@ -104,7 +104,13 @@ nada.
 saem de `bolao_pontos` — painel, página pública e ranking leem as views
 `bolao_palpites_pontuados` e `bolao_ranking` (`security_invoker`, respeitam a
 RLS). `src/lib/bolao.ts` repete a regra só para a tela; mudou no SQL, mude o
-texto de `REGRAS`. Campeão da rodada, evolução e "próprio time" só somam
+texto de `REGRAS` (e `REGRA_ZEBRA`). Resenha e zebra (`0004_resenha_e_zebra.sql`)
+moram na linha do palpite para herdar prazo e sigilo da RLS; uma zebra por
+rodada é o trigger `bolao_uma_zebra_por_rodada`. `pontos` já vem dobrado pela
+zebra e `pontos_base` é a faixa da regra: exato, resultado certo e as colunas
++5/+3/+2/+1 contam pela base, nunca por `pontos`. A leitura dos palpites é
+`select('*')` normalizado em `palpiteDaLinha`, para o site não cair antes de a
+migração rodar. Campeão da rodada, evolução e "próprio time" só somam
 os pontos que vêm do banco (`placarDaRodada`, `evolucao` e
 `desempenhoNoProprioTime` em `bolao.ts`); o time de cada clube é casado pelo
 nome do football-data em `TIME_DO_CLUBE` (a sigla de lá repete: Corinthians e

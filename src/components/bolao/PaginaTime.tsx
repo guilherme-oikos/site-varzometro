@@ -4,6 +4,7 @@ import AvatarAutor from '@/components/painel/AvatarAutor';
 import CardJogo from '@/components/bolao/CardJogo';
 import Escudo from '@/components/bolao/Escudo';
 import FiltroTimes from '@/components/bolao/FiltroTimes';
+import LembretePalpite from '@/components/bolao/LembretePalpite';
 import PalpitesDoLogado from '@/components/bolao/PalpitesDoLogado';
 import RegrasBolao from '@/components/bolao/RegrasBolao';
 import { ArrowLeftIcon } from '@/components/Icons';
@@ -42,6 +43,8 @@ export default async function PaginaTime({ slug }: { slug: string }) {
         <p className="t-lead medida-apoio mt-4 text-muted">
           Todos os jogos do {time.nome} no bolão, com o palpite da bancada em cada um.
         </p>
+
+        <LembretePalpite />
 
         <div className="mt-10">
           <FiltroTimes times={timesDoBolao(bolao.jogos)} atual={time.slug} />

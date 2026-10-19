@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
-import type { StatusJogo } from '@/lib/bolao';
+import { RESENHA_MAX, type StatusJogo } from '@/lib/bolao';
 import { sincronizarBolao } from '@/lib/bolao-sync';
 import { exigirSessao } from '@/lib/painel';
 import { supabaseServidor } from '@/lib/supabase/server';
@@ -270,6 +270,9 @@ export type PalpiteEnviado = {
   jogo_id: number;
   gols_mandante: number | string | null;
   gols_visitante: number | string | null;
+  resenha?: string | null;
+  /** Zebra da rodada. Uma por rodada: o trigger do banco tira a anterior. */
+  dobrado?: boolean;
 };
 
 /**
@@ -278,6 +281,9 @@ export type PalpiteEnviado = {
  *
  * Quem barra jogo já começado é a RLS. Aqui só se traduz a recusa — e cada
  * jogo vai separado, para um jogo fechado não derrubar os outros.
+ *
+ * A zebra que sai vai antes da que entra: o banco aceita só uma por rodada e
+ * tira a anterior sozinho, mas assim a ordem nunca depende disso.
  */
 export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado> {
   const { supabase, user, perfil } = await exigirSessao();
@@ -286,10 +292,15 @@ export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado
   const fechados: number[] = [];
   let salvos = 0;
 
-  for (const item of lista.slice(0, 40)) {
+  const ordenada = [...lista.slice(0, 40)].sort((a, b) => Number(Boolean(a.dobrado)) - Number(Boolean(b.dobrado)));
+
+  for (const item of ordenada) {
     const jogo = Number(item.jogo_id);
     const mandante = gols(item.gols_mandante);
     const visitante = gols(item.gols_visitante);
+    // Espaço repetido e quebra de linha viram um espaço só; vazio é sem resenha.
+    const resenha = String(item.resenha ?? '').replace(/\s+/g, ' ').trim() || null;
+    const dobrado = Boolean(item.dobrado);
 
     if (!Number.isInteger(jogo)) continue;
     if (mandante === undefined || visitante === undefined) {
@@ -297,6 +308,13 @@ export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado
     }
     if ((mandante === null) !== (visitante === null)) {
       return { ok: false, erro: 'Preencha os dois lados do placar (ou deixe os dois vazios).' };
+    }
+
+    if (resenha && resenha.length > RESENHA_MAX) {
+      return { ok: false, erro: `A resenha cabe em até ${RESENHA_MAX} caracteres.` };
+    }
+    if ((resenha || dobrado) && mandante === null) {
+      return { ok: false, erro: 'Resenha e zebra precisam de um placar no mesmo jogo.' };
     }
 
     if (mandante === null || visitante === null) {
@@ -308,12 +326,20 @@ export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado
     const { error } = await supabase
       .from('bolao_palpites')
       .upsert(
-        { jogo_id: jogo, autor_id: user.id, gols_mandante: mandante, gols_visitante: visitante },
+        { jogo_id: jogo, autor_id: user.id, gols_mandante: mandante, gols_visitante: visitante, resenha, dobrado },
         { onConflict: 'jogo_id,autor_id' },
       );
 
     // 42501 é a RLS recusando: o jogo começou entre abrir a tela e salvar.
     if (error) {
+      // P0001: o trigger da zebra — a desta rodada já está num jogo que começou.
+      if (error.code === 'P0001') {
+        return { ok: false, erro: 'A zebra desta rodada já foi usada num jogo que começou. Os palpites anteriores foram salvos.' };
+      }
+      // PGRST204: coluna que não existe — o 0004_resenha_e_zebra.sql não rodou.
+      if (error.code === 'PGRST204') {
+        return { ok: false, erro: 'Falta rodar a migração 0004_resenha_e_zebra.sql no Supabase.' };
+      }
       if (error.code !== '42501') return { ok: false, erro: `Não deu para salvar: ${error.message}` };
       fechados.push(jogo);
       continue;

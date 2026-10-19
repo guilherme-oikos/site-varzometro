@@ -95,6 +95,14 @@ Ordem dos cards e quem aparece na bancada ficam com o admin.
 2. Preencha o placar de cada jogo e clique em **Salvar palpites** (o botão fica
    grudado no pé da tela). Dá para mudar quantas vezes quiser **até o apito
    inicial** daquele jogo. Para desistir de um palpite, apague os dois números.
+   - **Resenha** (opcional): uma frase de até 80 caracteres embaixo do placar
+     ("o Peixe não perde na Vila nem a pau"). Fica escondida até o apito, como
+     o placar.
+   - **Zebra (2x)**: em **um jogo por rodada**, os pontos valem o dobro.
+     Marcar em outro jogo da mesma rodada tira do anterior — desde que ele não
+     tenha começado.
+   - No topo do bolão aparece um aviso quando algum jogo dos próximos 7 dias
+     está sem o seu palpite.
 3. Quando a bola rola, o seu palpite trava e aparece o de todo mundo, na mesma
    página que qualquer pessoa vê. Antes disso, ninguém vê o seu, só que você já
    palpitou.

@@ -28,6 +28,27 @@ export type Rodada = {
   quemPalpitou: { jogo_id: number; autor_id: string }[];
 };
 
+/**
+ * Linha de `bolao_palpites_pontuados` como vem do banco. Lida com `*` e não
+ * com a lista de colunas: até alguém rodar o 0004_resenha_e_zebra.sql, as
+ * colunas `resenha`, `dobrado` e `pontos_base` não existem, e pedi-las pelo
+ * nome derrubaria a página. Sem elas, vale o de antes: sem resenha, sem zebra.
+ */
+type LinhaDePalpite = Omit<Palpite, 'pontos_base' | 'resenha' | 'dobrado'> & Partial<Palpite>;
+
+function palpiteDaLinha(linha: LinhaDePalpite): Palpite {
+  return {
+    jogo_id: linha.jogo_id,
+    autor_id: linha.autor_id,
+    gols_mandante: linha.gols_mandante,
+    gols_visitante: linha.gols_visitante,
+    pontos: linha.pontos,
+    pontos_base: linha.pontos_base === undefined ? linha.pontos : linha.pontos_base,
+    resenha: linha.resenha ?? null,
+    dobrado: linha.dobrado ?? false,
+  };
+}
+
 function falhou(onde: string, mensagem: string): never {
   console.error(`[bolao] Supabase recusou ${onde}: ${mensagem}`);
   throw new Error(`[bolao] falha ao ler ${onde}: ${mensagem}`);
@@ -78,9 +99,9 @@ export async function lerJogos(cliente: SupabaseClient, bolao: Bolao, ids: numbe
   const [palpites, ...quem] = await Promise.all([
     cliente
       .from('bolao_palpites_pontuados')
-      .select('jogo_id, autor_id, gols_mandante, gols_visitante, pontos')
+      .select('*')
       .in('jogo_id', ids)
-      .returns<Palpite[]>(),
+      .returns<LinhaDePalpite[]>(),
     // `get: true` para a chamada sair como GET e entrar no cache do Next como
     // as outras consultas.
     ...rodadas.map((rodada) => cliente.rpc('bolao_quem_palpitou', { rodada_alvo: rodada }, { get: true })),
@@ -95,7 +116,7 @@ export async function lerJogos(cliente: SupabaseClient, bolao: Bolao, ids: numbe
     }
   }
 
-  return simularRodada(bolao, ids, { palpites: palpites.data, quemPalpitou });
+  return simularRodada(bolao, ids, { palpites: palpites.data.map(palpiteDaLinha), quemPalpitou });
 }
 
 /**
@@ -109,14 +130,14 @@ export async function lerPalpitesEncerrados(cliente: SupabaseClient, bolao: Bola
   for (let inicio = 0; ; inicio += PAGINA) {
     const { data, error } = await cliente
       .from('bolao_palpites_pontuados')
-      .select('jogo_id, autor_id, gols_mandante, gols_visitante, pontos')
+      .select('*')
       .not('pontos', 'is', null)
       .order('jogo_id')
       .order('autor_id')
       .range(inicio, inicio + PAGINA - 1)
-      .returns<Palpite[]>();
+      .returns<LinhaDePalpite[]>();
     if (error) falhou('o histórico de palpites', error.message);
-    todos.push(...data);
+    todos.push(...data.map(palpiteDaLinha));
     if (data.length < PAGINA) break;
   }
   return simularPalpites(bolao, null, todos);

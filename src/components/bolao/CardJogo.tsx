@@ -109,21 +109,34 @@ export default function CardJogo({
                 const palpite = palpites.find((p) => p.autor_id === autor.id);
                 const meu = autor.id === meuId;
                 return (
-                  <li key={autor.id} className="flex items-center gap-2.5 text-sm">
-                    <AvatarAutor autor={autor} tamanho="h-6 w-6" />
-                    <span className={`min-w-0 flex-1 truncate ${meu ? 'font-bold text-primary' : 'text-zinc-300'}`}>
-                      {meu ? 'Você' : autor.nome}
-                    </span>
-                    {palpite ? (
-                      <>
-                        <span className="numerico font-bold text-white">
-                          {palpite.gols_mandante} x {palpite.gols_visitante}
-                        </span>
-                        <SeloPontos pontos={palpite.pontos} />
-                      </>
-                    ) : (
-                      <span className="text-xs text-zinc-600">sem palpite</span>
-                    )}
+                  <li key={autor.id} className="text-sm">
+                    <div className="flex items-center gap-2.5">
+                      <AvatarAutor autor={autor} tamanho="h-6 w-6" />
+                      <span className={`min-w-0 flex-1 truncate ${meu ? 'font-bold text-primary' : 'text-zinc-300'}`}>
+                        {meu ? 'Você' : autor.nome}
+                      </span>
+                      {palpite ? (
+                        <>
+                          {palpite.dobrado ? (
+                            <span
+                              title="Zebra da rodada: este palpite vale o dobro"
+                              className="t-micro numerico rounded-md bg-primary/15 px-1.5 py-0.5 font-bold text-primary"
+                            >
+                              2x
+                            </span>
+                          ) : null}
+                          <span className="numerico font-bold text-white">
+                            {palpite.gols_mandante} x {palpite.gols_visitante}
+                          </span>
+                          <SeloPontos pontos={palpite.pontos} base={palpite.pontos_base} />
+                        </>
+                      ) : (
+                        <span className="text-xs text-zinc-600">sem palpite</span>
+                      )}
+                    </div>
+                    {palpite?.resenha ? (
+                      <p className="mt-1 pl-[2.125rem] text-xs italic text-muted">“{palpite.resenha}”</p>
+                    ) : null}
                   </li>
                 );
               })}

@@ -229,3 +229,12 @@ export function TrendingUpIcon(props: IconProps) {
     </svg>
   );
 }
+
+/** O `Loader2` do lucide, que o shadcn usa nos botões: gira com `animate-spin`. */
+export function SpinnerIcon(props: IconProps) {
+  return (
+    <svg {...base} aria-hidden {...props}>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}

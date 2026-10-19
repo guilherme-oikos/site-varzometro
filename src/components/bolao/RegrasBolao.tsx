@@ -1,5 +1,5 @@
 import SeloPontos from '@/components/bolao/SeloPontos';
-import { REGRAS } from '@/lib/bolao';
+import { REGRA_ZEBRA, REGRAS } from '@/lib/bolao';
 
 /** Como se pontua. O texto vem de `REGRAS`; a conta de verdade é do banco. */
 export default function RegrasBolao({ className = '' }: { className?: string }) {
@@ -13,6 +13,12 @@ export default function RegrasBolao({ className = '' }: { className?: string }) 
             <span>{regra.texto}</span>
           </li>
         ))}
+        <li className="flex items-start gap-3">
+          <span className="t-micro numerico inline-flex min-w-[2.25rem] justify-center rounded-full bg-primary/15 px-2 py-0.5 font-bold text-primary">
+            2x
+          </span>
+          <span>{REGRA_ZEBRA}</span>
+        </li>
       </ul>
       <p className="mt-3 text-xs text-muted">
         Palpite vale até o apito inicial. Empate no ranking: desempata quem tem mais placares exatos,

@@ -34,9 +34,18 @@ export type Palpite = {
   autor_id: string;
   gols_mandante: number;
   gols_visitante: number;
-  /** Nulo enquanto o jogo não terminou. */
+  /** Nulo enquanto o jogo não terminou. Já conta a zebra (o dobro). */
   pontos: number | null;
+  /** A faixa da regra (5, 3, 2, 1, 0), sem a zebra: é o que conta exato e resultado certo. */
+  pontos_base: number | null;
+  /** Frase curta junto do placar. Some junto com o palpite até o apito. */
+  resenha: string | null;
+  /** Zebra da rodada: este jogo vale o dobro. */
+  dobrado: boolean;
 };
+
+/** Limite da resenha — o mesmo do `check` em 0004_resenha_e_zebra.sql. */
+export const RESENHA_MAX = 80;
 
 export type AutorDoBolao = { id: string; nome: string; iniciais: string; foto: string | null };
 
@@ -74,6 +83,9 @@ export const REGRAS = [
   { pontos: 2, texto: 'Acertou o vencedor (ou o empate)' },
   { pontos: 1, texto: 'Errou o resultado, mas cravou os gols de um dos times' },
 ] as const;
+
+/** Mesma regra do trigger `bolao_uma_zebra_por_rodada`. */
+export const REGRA_ZEBRA = 'Zebra: em um jogo por rodada, os pontos valem o dobro.';
 
 /** Mesma regra de `bolao_aberto` no banco. Aqui é só para a tela; quem barra é a RLS. */
 export function jogoAberto(jogo: Jogo, agora = Date.now()): boolean {
@@ -185,7 +197,7 @@ export function placarDaRodada(jogos: Jogo[], palpites: Palpite[], autores: Auto
       return {
         autor,
         pontos: meus.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
-        exatos: meus.filter((p) => p.pontos === 5).length,
+        exatos: meus.filter((p) => p.pontos_base === 5).length,
       };
     })
     .sort((a, b) => b.pontos - a.pontos || b.exatos - a.exatos);
@@ -267,7 +279,7 @@ export function desempenhoNoProprioTime(
     for (const p of palpites) {
       const jogo = encerrados.get(p.jogo_id);
       if (!jogo || p.autor_id !== autor.id || p.pontos === null) continue;
-      const acertou = p.pontos >= 2;
+      const acertou = (p.pontos_base ?? 0) >= 2;
       if (jogo.mandante === time || jogo.visitante === time) {
         linha.jogos++;
         linha.pontos += p.pontos;
@@ -287,8 +299,8 @@ export function desempenhoNoProprioTime(
 
 export type TimeDoBolao = { nome: string; slug: string; sigla: string; escudo: string | null; grande: boolean };
 
-/** "São Paulo" → "sao-paulo". Endereço de /bolao/time/<slug>. */
-export function slugDoTime(nome: string): string {
+/** "São Paulo" → "sao-paulo", "Léo" → "leo". Endereço de /bolao/time/<slug> e /bolao/duelo/<a>-x-<b>. */
+export function paraSlug(nome: string): string {
   return nome
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -313,7 +325,7 @@ export function timesDoBolao(jogos: Jogo[]): TimeDoBolao[] {
       [jogo.visitante, jogo.visitante_sigla, jogo.visitante_escudo],
     ] as const) {
       const atual = porNome.get(nome);
-      if (!atual) porNome.set(nome, { nome, slug: slugDoTime(nome), sigla, escudo, grande: GRANDES.has(nome) });
+      if (!atual) porNome.set(nome, { nome, slug: paraSlug(nome), sigla, escudo, grande: GRANDES.has(nome) });
       else if (!atual.escudo && escudo) atual.escudo = escudo;
     }
   }
@@ -339,9 +351,98 @@ export function rankingNoTime(
       return {
         autor,
         pontos: meus.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
-        acertos: meus.filter((p) => (p.pontos ?? 0) >= 2).length,
+        acertos: meus.filter((p) => (p.pontos_base ?? 0) >= 2).length,
         jogos: meus.length,
       };
     })
     .sort((a, b) => b.pontos - a.pontos || b.acertos - a.acertos);
+}
+
+/* ---------------------------------------------------------------- Duelo -- */
+
+export type JogoDoDuelo = {
+  jogo: Jogo;
+  a: Palpite | null;
+  b: Palpite | null;
+  /** Quem fez mais pontos no jogo; `null` é empate. Sem palpite vale zero. */
+  vencedor: 'a' | 'b' | null;
+};
+
+export type Duelo = {
+  a: AutorDoBolao;
+  b: AutorDoBolao;
+  vitoriasA: number;
+  vitoriasB: number;
+  empates: number;
+  pontosA: number;
+  pontosB: number;
+  exatosA: number;
+  exatosB: number;
+  /** Jogos encerrados em que pelo menos um dos dois palpitou, do mais recente ao mais antigo. */
+  jogos: JogoDoDuelo[];
+  /** O jogo de maior diferença de pontos entre os dois. */
+  goleada: JogoDoDuelo | null;
+};
+
+/** Endereço do duelo, sempre na ordem da bancada: "gj-x-marti", nunca "marti-x-gj". */
+export function slugDoDuelo(a: AutorDoBolao, b: AutorDoBolao, autores: AutorDoBolao[]): string {
+  const [primeiro, segundo] = autores.indexOf(a) <= autores.indexOf(b) ? [a, b] : [b, a];
+  return `${paraSlug(primeiro.nome)}-x-${paraSlug(segundo.nome)}`;
+}
+
+/** Todas as duplas da bancada, na ordem dos cards (5 pessoas, 10 duelos). */
+export function duplas(autores: AutorDoBolao[]): [AutorDoBolao, AutorDoBolao][] {
+  return autores.flatMap((a, i) => autores.slice(i + 1).map((b) => [a, b] as [AutorDoBolao, AutorDoBolao]));
+}
+
+/**
+ * Confronto direto: em cada jogo encerrado, quem fez mais pontos leva. Conta
+ * o total com a zebra (é o que vale no ranking); exato é pela faixa da regra.
+ */
+export function duelo(jogos: Jogo[], palpites: Palpite[], a: AutorDoBolao, b: AutorDoBolao): Duelo {
+  const resultado: Duelo = {
+    a,
+    b,
+    vitoriasA: 0,
+    vitoriasB: 0,
+    empates: 0,
+    pontosA: 0,
+    pontosB: 0,
+    exatosA: 0,
+    exatosB: 0,
+    jogos: [],
+    goleada: null,
+  };
+
+  const encerrados = jogos
+    .filter((jogo) => jogo.status === 'encerrado')
+    .sort((x, y) => new Date(y.inicio).getTime() - new Date(x.inicio).getTime());
+
+  let maiorDiferenca = 0;
+  for (const jogo of encerrados) {
+    const pa = palpites.find((p) => p.jogo_id === jogo.id && p.autor_id === a.id) ?? null;
+    const pb = palpites.find((p) => p.jogo_id === jogo.id && p.autor_id === b.id) ?? null;
+    if (!pa && !pb) continue;
+
+    const na = pa?.pontos ?? 0;
+    const nb = pb?.pontos ?? 0;
+    const vencedor = na > nb ? 'a' : nb > na ? 'b' : null;
+    const linha: JogoDoDuelo = { jogo, a: pa, b: pb, vencedor };
+    resultado.jogos.push(linha);
+
+    resultado.pontosA += na;
+    resultado.pontosB += nb;
+    if (pa?.pontos_base === 5) resultado.exatosA++;
+    if (pb?.pontos_base === 5) resultado.exatosB++;
+    if (vencedor === 'a') resultado.vitoriasA++;
+    else if (vencedor === 'b') resultado.vitoriasB++;
+    else resultado.empates++;
+
+    if (Math.abs(na - nb) > maiorDiferenca) {
+      maiorDiferenca = Math.abs(na - nb);
+      resultado.goleada = linha;
+    }
+  }
+
+  return resultado;
 }

@@ -21,7 +21,8 @@
     "react-markdown": "^10.1.0",
     "recharts": "2.15.4",
     "remark-unwrap-images": "^4.0.1",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "sonner": "2.0.8"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",

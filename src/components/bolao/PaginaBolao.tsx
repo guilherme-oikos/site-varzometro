@@ -1,7 +1,10 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CampeaoRodada from '@/components/bolao/CampeaoRodada';
+import { ArrowRightIcon } from '@/components/Icons';
 import CardJogo from '@/components/bolao/CardJogo';
 import FiltroTimes from '@/components/bolao/FiltroTimes';
+import LembretePalpite from '@/components/bolao/LembretePalpite';
 import GraficoEvolucao from '@/components/bolao/GraficoEvolucao';
 import PalpitesDoLogado from '@/components/bolao/PalpitesDoLogado';
 import ProprioTime from '@/components/bolao/ProprioTime';
@@ -70,6 +73,7 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
           </div>
         ) : (
           <>
+          <LembretePalpite />
           <div className="mt-10">
             <FiltroTimes times={timesDoBolao(bolao.jogos)} />
           </div>
@@ -108,6 +112,13 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
               <div className="mt-4">
                 <TabelaRanking ranking={bolao.ranking} />
               </div>
+              <Link
+                href="/bolao/duelo"
+                className="toque-linha mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                Duelo: um contra um da bancada
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
               <RegrasBolao className="mt-6 hidden lg:block" />
             </aside>
           </div>

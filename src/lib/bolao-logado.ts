@@ -110,3 +110,47 @@ export async function atualizarParaLogado(): Promise<{ sincronizou: boolean } | 
   if (sincronizou) revalidateTag(TAG_BOLAO);
   return { sincronizou };
 }
+
+export type Lembrete = {
+  /** Jogos que ainda aceitam palpite, nos próximos `JANELA_DO_LEMBRETE_DIAS`, sem o palpite da pessoa. */
+  faltam: number;
+  proximo: Pick<Jogo, 'id' | 'rodada' | 'mandante' | 'visitante' | 'inicio'> | null;
+};
+
+const JANELA_DO_LEMBRETE_DIAS = 7;
+
+/**
+ * "Faltam 3 jogos sem palpite, o primeiro começa em 2h." Esquecer de palpitar
+ * é o que mais desanima num bolão; o aviso aparece no topo do /bolao para quem
+ * está logado (`LembretePalpite`). Mesma regra de prazo de `bolao_aberto`.
+ */
+export async function lerLembrete(): Promise<Lembrete | null> {
+  const logado = await sessao();
+  if (!logado) return null;
+  const { supabase, user } = logado;
+
+  const agora = new Date();
+  const limite = new Date(agora.getTime() + JANELA_DO_LEMBRETE_DIAS * 24 * 60 * 60 * 1000);
+  const { data: jogos, error } = await supabase
+    .from('bolao_jogos')
+    .select('id, rodada, mandante, visitante, inicio')
+    .eq('status', 'agendado')
+    .eq('revelado', false)
+    .gt('inicio', agora.toISOString())
+    .lte('inicio', limite.toISOString())
+    .order('inicio')
+    .returns<Lembrete['proximo'][]>();
+  if (error || !jogos?.length) return { faltam: 0, proximo: null };
+
+  const ids = jogos.map((jogo) => jogo!.id);
+  const { data: meus } = await supabase
+    .from('bolao_palpites')
+    .select('jogo_id')
+    .eq('autor_id', user.id)
+    .in('jogo_id', ids)
+    .returns<{ jogo_id: number }[]>();
+  const palpitados = new Set((meus ?? []).map((p) => p.jogo_id));
+  const sem = jogos.filter((jogo) => !palpitados.has(jogo!.id));
+
+  return { faltam: sem.length, proximo: sem[0] ?? null };
+}
