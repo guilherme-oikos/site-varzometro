@@ -3,11 +3,12 @@ import { dataIso, getAllPosts } from '@/lib/posts';
 import { site } from '@/lib/site';
 
 /**
- * Gerado a cada build a partir de `content/posts/`: artigo novo entra aqui
- * sozinho, sem ninguém mexer neste arquivo.
+ * Montado a partir dos artigos publicados: artigo novo entra aqui sozinho, sem
+ * ninguém mexer neste arquivo. Publicar no painel invalida o cache dele junto
+ * com o do blog. /painel e /login ficam de fora de propósito.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
-  const todos = getAllPosts();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const todos = await getAllPosts();
 
   const posts = todos.map((post) => ({
     url: `${site.url}/blog/${post.slug}`,
@@ -33,6 +34,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: ultimoArtigo,
       changeFrequency: 'weekly',
       priority: 0.9,
+    },
+    {
+      // Muda a cada jogo: o apito abre os palpites e o placar mexe no ranking.
+      url: `${site.url}/bolao`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.6,
     },
     {
       url: `${site.url}/politica-de-privacidade`,

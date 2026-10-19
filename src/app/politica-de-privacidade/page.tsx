@@ -4,15 +4,17 @@ import { ArrowLeftIcon, MailIcon } from '@/components/Icons';
 import { site } from '@/lib/site';
 
 /**
- * IMPORTANTE — este texto descreve o site como ele é hoje:
- * estático, sem formulário, sem login, sem analytics e sem cookies próprios.
+ * IMPORTANTE — este texto descreve o site como ele é hoje: sem formulário
+ * público, sem analytics e sem cookies para visitantes. O único login é o da
+ * área da bancada (/login e /painel), e o cookie de sessão dele só existe para
+ * quem entra lá — por isso continua sem banner de cookies.
  *
  * Se um dia forem adicionados Google Analytics, Meta Pixel, newsletter,
  * formulário de contato ou players incorporados (YouTube/Spotify dentro da
  * página), esta política precisa ser atualizada — e aí passa a ser necessário
  * um aviso de cookies. Atualize também a data em `ultimaAtualizacao`.
  */
-const ultimaAtualizacao = '9 de setembro de 2026';
+const ultimaAtualizacao = '19 de outubro de 2026';
 
 export const metadata: Metadata = {
   title: 'Política de Privacidade e Cookies',
@@ -45,8 +47,9 @@ export default function PoliticaDePrivacidadePage() {
           </h1>
 
           <p className="t-lead mt-5 text-muted">
-            Em resumo: este site não pede cadastro, não tem formulário, não usa
-            cookies próprios e não rastreia quem passa por aqui. O texto abaixo
+            Em resumo: para quem lê, este site não pede cadastro, não tem
+            formulário, não usa cookies e não rastreia quem passa por aqui. O
+            único login é o da bancada, para publicar os artigos. O texto abaixo
             detalha isso.
           </p>
 
@@ -71,10 +74,24 @@ export default function PoliticaDePrivacidadePage() {
 
           <h2>2. Que dados este site coleta</h2>
           <p>
-            <strong>Nenhum dado pessoal é coletado diretamente por nós.</strong>{' '}
-            O site é estático: não existe cadastro, login, formulário, carrinho,
-            newsletter ou área restrita. Você navega, lê, clica nos links e vai
-            embora — sem deixar dados conosco.
+            <strong>De quem visita, nenhum dado pessoal é coletado diretamente
+            por nós.</strong>{' '}
+            Não existe cadastro aberto, formulário, carrinho ou newsletter. Você
+            navega, lê, clica nos links e vai embora — sem deixar dados conosco.
+          </p>
+          <p>
+            A exceção é a <strong>área da bancada</strong>, usada só pelos
+            integrantes e colaboradores do podcast para editar o próprio perfil e
+            publicar artigos. As contas são criadas por nós, não há cadastro
+            público. Dela guardamos o e-mail e a senha de acesso (cifrada, nunca
+            em texto puro), o nome, o clube, a bio e as fotos do perfil, e os
+            artigos com rascunhos, e os palpites do bolão — que ficam públicos
+            na página do bolão a partir do início de cada jogo, junto com o nome
+            e a foto de quem palpitou. Esses dados ficam no{' '}
+            <strong>Supabase</strong>, que presta o serviço de banco de dados e
+            autenticação no papel de operador. A base legal é a execução das
+            atividades do projeto do qual a pessoa participa (artigo 7º, inciso
+            V, da LGPD).
           </p>
           <p>
             Se você nos escrever por e-mail ou pelas redes sociais, aí sim
@@ -105,10 +122,16 @@ export default function PoliticaDePrivacidadePage() {
 
           <h2>4. Cookies</h2>
           <p>
-            <strong>Este site não instala cookies próprios</strong> e não usa
-            ferramentas de análise de audiência, remarketing ou publicidade
-            comportamental. Não há rastreamento entre sites e não existe banner
-            de consentimento porque não há o que consentir.
+            <strong>Para quem visita, este site não instala cookies</strong> e
+            não usa ferramentas de análise de audiência, remarketing ou
+            publicidade comportamental. Não há rastreamento entre sites e não
+            existe banner de consentimento porque não há o que consentir.
+          </p>
+          <p>
+            Só quem entra na área da bancada recebe um cookie: o de sessão, que
+            mantém a pessoa logada. Ele é estritamente necessário para o login
+            funcionar, não serve para mais nada e é apagado ao clicar em
+            “Sair”.
           </p>
           <p>
             Os links para YouTube, Spotify, TikTok e Instagram levam você para
@@ -131,13 +154,18 @@ export default function PoliticaDePrivacidadePage() {
             vídeo é reproduzido dentro do nosso site: os players abrem sempre nas
             plataformas de origem.
           </p>
+          <p>
+            As imagens dentro dos artigos do blog ficam guardadas no Supabase e
+            são carregadas a partir dos servidores dele, que também podem
+            registrar o endereço IP de quem abre a página.
+          </p>
 
           <h2>6. Compartilhamento de dados</h2>
           <p>
             Não vendemos, alugamos, cedemos nem comercializamos dados pessoais.
-            Como não coletamos dados por conta própria, não há o que
-            compartilhar. Os registros técnicos citados no item 3 ficam
-            exclusivamente com o provedor de hospedagem, no papel de operador.
+            Os registros técnicos citados no item 3 ficam exclusivamente com o
+            provedor de hospedagem, e os dados da área da bancada citados no
+            item 2 com o Supabase — os dois no papel de operador.
           </p>
 
           <h2>7. Seus direitos</h2>
@@ -159,6 +187,13 @@ export default function PoliticaDePrivacidadePage() {
             e-mail do projeto apenas enquanto forem necessárias para o assunto
             tratado, e são protegidas pelas medidas de segurança do próprio
             provedor de e-mail, incluindo autenticação em duas etapas.
+          </p>
+          <p>
+            Na área da bancada, cada pessoa só consegue alterar o próprio perfil
+            e os próprios artigos — a regra é aplicada no banco de dados, não só
+            na tela. Quando alguém deixa o projeto, a conta é removida a pedido;
+            os artigos já publicados podem continuar no ar com a autoria
+            original.
           </p>
 
           <h2>9. Crianças e adolescentes</h2>

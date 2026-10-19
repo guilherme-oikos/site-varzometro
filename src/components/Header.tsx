@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Logo from '@/components/Logo';
+import MenuPerfil from '@/components/MenuPerfil';
 import { CloseIcon, MenuIcon, SpotifyIcon, YoutubeIcon } from '@/components/Icons';
 import { navLinks, socials } from '@/lib/site';
 
@@ -168,6 +169,9 @@ export default function Header() {
               Assistir no YouTube
             </a>
 
+            {/* Só aparece para quem está logado na área da bancada. */}
+            <MenuPerfil />
+
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
@@ -188,7 +192,7 @@ export default function Header() {
       {/* Drawer mobile */}
       <div
         className={`overflow-hidden border-t border-ink-line bg-ink/98 backdrop-blur-xl transition-[max-height,opacity] duration-300 ease-smooth md:hidden ${
-          open ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'
+          open ? 'max-h-[480px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <nav className="container-page flex flex-col gap-1 py-4">

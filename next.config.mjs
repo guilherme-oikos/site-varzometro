@@ -11,6 +11,13 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'i.ytimg.com' },
       { protocol: 'https', hostname: 'img.youtube.com' },
+      // Fotos de perfil e capas enviadas pelo painel (Storage do Supabase). Só
+      // a pasta pública dos buckets, nada mais do domínio.
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 };

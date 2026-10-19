@@ -31,7 +31,12 @@ npm start       # sobe o build localmente
 
 ```
 content/
-  posts/                    # artigos do blog (.md) — adicione arquivos aqui
+  posts/                    # artigos .md — reserva sem Supabase e origem da migração
+supabase/
+  migrations/0001_inicial.sql  # tabelas, RLS e bucket — rodar no SQL Editor
+  migrations/0002_bolao.sql    # bolão: jogos, palpites, pontuação e ranking
+scripts/
+  migrar-para-supabase.mts  # `npm run migrar`: leva bancada e artigos para o banco
 public/
   logo.png                  # logo oficial (coloque o arquivo aqui)
   og.jpg                    # imagem de compartilhamento 1200x630 (opcional)
@@ -45,7 +50,13 @@ src/
     robots.ts / sitemap.ts  # SEO técnico
     blog/
       page.tsx              # listagem com filtro por clube
-      [slug]/page.tsx       # artigo individual (MDX)
+      [slug]/page.tsx       # artigo individual (Markdown)
+    bolao/                  # bolão público: ranking e palpites (/bolao, /bolao/rodada/N)
+    escudos/[arquivo]/      # escudos dos times servidos pelo nosso domínio
+    login/page.tsx          # login da bancada
+    painel/                 # área logada: artigos, editor, perfil, Server Actions (o bolão é palpitado em /bolao)
+    api/manter-ativo/       # cron diário que impede o Supabase grátis de pausar
+    api/bolao/sincronizar/  # cron diário que traz jogos e placares do football-data
   components/
     Header.tsx              # navegação fixa + menu hambúrguer
     Hero.tsx                # abertura
@@ -60,8 +71,14 @@ src/
     FloatingCTA.tsx         # botão fixo de conversão
     Logo.tsx / Icons.tsx
   lib/
-    site.ts                 # TODO o conteúdo editável (links, bancada, episódios, cortes)
-    posts.ts                # leitura dos Markdown + tempo de leitura
+    site.ts                 # conteúdo institucional (links, clubes, episódios, cortes) e bancada de reserva
+    posts.ts                # artigos: Supabase, ou content/posts/ como reserva
+    perfis.ts               # bancada: Supabase, ou site.ts como reserva
+    painel.ts               # sessão e tipos do painel
+    bolao.ts                # tipos e regras do bolão (puro, serve ao client)
+    bolao-dados.ts          # leituras do bolão (site público e painel)
+    bolao-sync.ts           # busca no football-data.org e grava no banco
+    supabase/               # clientes (público com cache, servidor com sessão, navegador)
     media.ts                # checagem de arquivos em /public
 ```
 
@@ -75,7 +92,7 @@ Quase tudo o que muda no dia a dia está em **`src/lib/site.ts`**:
 | --- | --- |
 | Links de YouTube, Spotify, TikTok, Instagram | `socials` |
 | E-mail de contato e URL do site | `site` |
-| Integrantes da bancada | `bancada` |
+| Integrantes da bancada | cada um pelo painel (`/painel/perfil`); `bancada` no `site.ts` é só reserva |
 | Episódios do carrossel | `episodios` |
 | Cortes verticais | `cortes` |
 | Textos dos pilares e do manifesto | `pilares`, `manifestoDestaques` |
@@ -163,14 +180,16 @@ em `cortes` no `src/lib/site.ts`:
 
 ## Publicando um artigo no blog
 
-> **Guia passo a passo:** [`PUBLICAR.md`](PUBLICAR.md) — escrito para quem vai
-> subir os textos sem mexer em código. O modelo pronto para copiar está em
-> [`content/MODELO-DE-ARTIGO.md`](content/MODELO-DE-ARTIGO.md).
->
-> A seção abaixo é a versão resumida.
+**Em produção, artigo se publica pelo painel:** cada integrante entra em
+`/login`, escreve e clica em **Publicar**. Sai no ar na hora, sem deploy. Guia
+para quem escreve: [`PUBLICAR.md`](PUBLICAR.md). Como ligar o login e o banco:
+[`SUPABASE.md`](SUPABASE.md).
 
-**Sim: um arquivo `.md` na pasta `content/posts/` é o artigo.** Não existe painel,
-banco de dados nem login. Criou o arquivo, o artigo existe.
+Artigos e perfis ficam no Supabase (Postgres + Storage). Quando as variáveis do
+Supabase **não** estão configuradas — rodando local sem conta, por exemplo —, o
+site cai na reserva: lê os arquivos `.md` de `content/posts/` e a bancada do
+`src/lib/site.ts`. O resto desta seção descreve esse formato de arquivo, que é
+também o que o `npm run migrar` leva para o banco.
 
 O nome do arquivo vira o endereço da página:
 
@@ -190,7 +209,7 @@ autor, a tag do clube e a data que aparecem no card:
 title: 'Título chamativo do artigo'
 excerpt: 'Resumo de uma ou duas linhas, que aparece no card e no Google.'
 date: '2026-09-06'
-author: 'GJ'          # GJ, Marti, Vinícius ou Gê
+author: 'GJ'          # GJ, Marti, Vinícius, Gê ou Léo
 clube: 'SPFC'         # SPFC | SCCP | SEP | SFC
 tags: ['pré-jogo', 'clássico']
 ---
@@ -272,13 +291,11 @@ deixa a página lenta; abaixo de 300 KB é um bom alvo.
 O artigo `pre-jogo-classico-o-que-cada-time-precisa-fazer.md` tem uma imagem de
 exemplo no meio do texto, só para você ver como fica. Pode trocar ou apagar.
 
-### Onde criar o arquivo
+### O texto é Markdown puro
 
-- **Testando no seu computador:** salve o `.md` na pasta e ele aparece na hora em
-  `localhost:3000/blog`.
-- **Publicando de verdade:** o arquivo precisa chegar ao repositório do GitHub —
-  ou pelo site do GitHub (**Add file → Create new file**, cola o texto, **Commit**),
-  ou por `git push`. A Vercel republica o site sozinha em cerca de 1 minuto.
+O corpo do artigo é renderizado com `react-markdown`, não MDX: o texto vem do
+banco, escrito por quem tem login, e MDX executaria JavaScript embutido. HTML
+colado no texto aparece como texto.
 
 ---
 
@@ -290,7 +307,17 @@ exemplo no meio do texto, só para você ver como fica. Pode trocar ou apagar.
    sitemap e Open Graph). Use a versão que devolve 200, não a que redireciona:
    hoje é `https://www.varzometro.com.br`, porque o domínio sem www manda para ela.
 
-Nenhuma variável de ambiente é necessária.
+Variáveis em **Settings → Environment Variables** (detalhes em `.env.example`):
+
+| Variável | Para quê |
+| --- | --- |
+| `YOUTUBE_API_KEY` | vídeos do canal se atualizarem sozinhos — obrigatória em produção |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | login da bancada, perfis e artigos (ver `SUPABASE.md`) |
+| `CRON_SECRET` | protege os agendamentos diários (Supabase ativo e sincronização do bolão) |
+| `FOOTBALL_DATA_TOKEN` | jogos e placares do Brasileirão para o bolão (ver `SUPABASE.md`, passo 7) |
+
+A `SUPABASE_SERVICE_ROLE_KEY` **não** vai para a Vercel: é só para o script de
+migração, na sua máquina.
 
 ---
 

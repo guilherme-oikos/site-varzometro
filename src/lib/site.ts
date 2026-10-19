@@ -38,6 +38,7 @@ export const navLinks = [
   { label: 'A Bancada', href: '/#bancada' },
   { label: 'Episódios', href: '/#episodios' },
   { label: 'Blog', href: '/blog' },
+  { label: 'Bolão', href: '/bolao' },
 ] as const;
 
 /* ---------------------------------- Clubes --------------------------------- */

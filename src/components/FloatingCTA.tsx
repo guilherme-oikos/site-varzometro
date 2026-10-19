@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { PlayIcon, SpotifyIcon, YoutubeIcon } from '@/components/Icons';
 import { socials } from '@/lib/site';
@@ -9,9 +10,17 @@ import { socials } from '@/lib/site';
  * Mobile: barra inferior com os dois destinos.
  * Desktop: pílula flutuante no canto inferior direito.
  * Aparece só depois que o usuário rola a primeira dobra.
+ *
+ * Some na área da bancada (/painel e /login): é chamada para o público ouvir
+ * o podcast, e ali só atrapalha quem está escrevendo — no celular a barra
+ * cobria o fim do editor.
+ *
+ * Some também no bolão (/bolao e as páginas de rodada e de time): o botão
+ * "Salvar palpites" fica grudado no pé da tela, no mesmo lugar.
  */
 export default function FloatingCTA() {
   const [visivel, setVisivel] = useState(false);
+  const rota = usePathname();
 
   useEffect(() => {
     const onScroll = () => setVisivel(window.scrollY > 520);
@@ -19,6 +28,10 @@ export default function FloatingCTA() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  if (rota.startsWith('/painel') || rota === '/login' || rota === '/bolao' || rota.startsWith('/bolao/')) {
+    return null;
+  }
 
   return (
     <>

@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/manter-ativo", "schedule": "0 9 * * *" },
+    { "path": "/api/bolao/sincronizar", "schedule": "0 5 * * *" }
+  ]
+}

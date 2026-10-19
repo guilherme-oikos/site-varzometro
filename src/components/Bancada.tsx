@@ -1,9 +1,11 @@
 import SectionHeading from '@/components/SectionHeading';
 import CardIntegrante from '@/components/CardIntegrante';
-import { bancada } from '@/lib/site';
+import { getBancada } from '@/lib/perfis';
 import { publicFileExists } from '@/lib/media';
 
-export default function Bancada() {
+export default async function Bancada() {
+  const bancada = await getBancada();
+
   return (
     <section id="bancada" className="relative scroll-mt-24 py-20 sm:py-28">
       <div className="container-page">

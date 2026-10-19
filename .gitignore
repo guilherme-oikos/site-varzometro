@@ -13,3 +13,6 @@ next-env.d.ts
 # Rascunhos de sessao das ferramentas de design (prints e logs, nao sao do site)
 .impeccable/questions
 .impeccable/review
+
+# Contas e senhas da migração para o Supabase (scripts/migrar-para-supabase.mts)
+scripts/contas.json

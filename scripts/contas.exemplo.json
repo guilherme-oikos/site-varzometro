@@ -1,0 +1,7 @@
+{
+  "GJ": { "usuario": "gj", "senha": "troque-esta-senha-1", "admin": true },
+  "Marti": { "usuario": "marti", "senha": "troque-esta-senha-2" },
+  "Vinícius": { "usuario": "vinicius", "senha": "troque-esta-senha-3" },
+  "Gê": { "usuario": "ge", "senha": "troque-esta-senha-4" },
+  "Léo": { "usuario": "leo", "senha": "troque-esta-senha-5" }
+}

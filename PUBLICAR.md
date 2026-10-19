@@ -1,82 +1,55 @@
 # Como publicar um artigo no blog
 
-Guia para quem vai subir os textos. Não precisa saber programar e não precisa
-usar terminal.
-
-O modelo pronto para copiar está em **`content/MODELO-DE-ARTIGO.md`**.
+Guia para quem escreve. Não precisa saber programar, não precisa de GitHub e não
+precisa de terminal: é tudo pelo navegador, no celular ou no computador.
 
 ---
 
-## Entendendo em 30 segundos
+## Entrando
 
-Cada artigo do blog é **um arquivo de texto**. Um arquivo = um artigo.
+1. Abra **varzometro.com.br/login**. Não tem link no site: salve esse endereço
+   nos favoritos.
+2. Entre com o usuário e a senha que você recebeu.
+3. Na primeira vez, vá em **Meu perfil → Senha** e troque a senha provisória.
 
-Eles moram em `content/posts/`. O site lê essa pasta e monta tudo sozinho: card,
-página, data, tempo de leitura, filtro por clube, Google.
-
-**O nome do arquivo vira o endereço da página:**
-
-```
-content/posts/pre-jogo-do-classico.md
-        ↓
-varzometro.com/blog/pre-jogo-do-classico
-```
-
-Por isso o nome do arquivo tem três regras:
-
-- só letras minúsculas
-- sem acento e sem ç (`pre-jogo`, não `pré-jogo`)
-- hífen no lugar de espaço
-- termina em `.md`
+Cada um só vê e só mexe nos próprios artigos e no próprio perfil.
 
 ---
 
-## O passo a passo
+## Escrevendo um artigo
 
-### 1. Receba o texto do seu amigo
+1. **Meus artigos → Novo artigo.** Abre um rascunho.
+2. **Título** e **Resumo**. O resumo é a frase que aparece no card do blog e na
+   prévia do WhatsApp.
+3. **Texto.** Cole ou escreva. Os botões em cima da caixa fazem a formatação:
 
-Pode vir por WhatsApp, e-mail, Word, qualquer coisa. Você vai copiar e colar.
+   | Botão | Vira | Como fica no texto |
+   |---|---|---|
+   | **B** | negrito | `**assim**` |
+   | **I** | itálico | `_assim_` |
+   | **H2** | subtítulo | `## Assim` numa linha sozinha |
+   | **❝** | citação | `> assim` |
+   | **•** | lista | `- assim` |
+   | **Link** | link | `[texto](https://...)` |
+   | **Imagem** | foto no meio do texto | envia e insere sozinho |
 
-### 2. Copie o modelo
+   Linha em branco separa parágrafo. Use a aba **Prévia** para ver como vai ficar
+   no site.
+4. **Clube.** Escolha o clube do texto. Se o artigo não for de um clube só —
+   arbitragem, CBF, calendário —, deixe **Geral**: sai com o selo laranja e fica
+   fora do filtro dos clubes.
+5. **Tags**, separadas por vírgula (`análise, clássico`). Opcional.
+6. **Capa.** Opcional: sem capa, o artigo ganha a arte do VARzômetro. Se enviar,
+   use foto **horizontal** — ela é cortada nas bordas para caber. Preencha a
+   **descrição** (o que aparece na foto; vira a legenda) e o **crédito**, se
+   houver.
+7. **Salvar rascunho** guarda sem publicar. Só você vê.
+8. **Publicar** põe no ar na hora. Não precisa esperar deploy nem avisar ninguém.
 
-Abra `content/MODELO-DE-ARTIGO.md`, copie tudo, e crie um arquivo novo dentro de
-`content/posts/` com o nome do artigo. Exemplo: `santos-na-vila.md`.
-
-> ⚠️ **Só coloque o arquivo em `content/posts/` quando ele estiver pronto para
-> publicar.** Tudo que está nessa pasta vai para o ar. Enquanto estiver
-> trabalhando no texto, deixe o arquivo em qualquer outro lugar do computador.
-
-### 3. Preencha o cabeçalho
-
-É o bloco entre as duas linhas de `---`, no topo. É a parte que precisa estar
-certa — o texto embaixo é livre.
-
-```
----
-title: 'Santos em reconstrução: o que ainda falta'
-excerpt: 'Time joga bem 60 minutos e entrega os outros 30.'
-date: '2026-09-10'
-author: 'Gê'
-clube: 'SFC'
-tags: ['análise', 'vila belmiro']
----
-```
-
-| Campo | Valores aceitos |
-|---|---|
-| `author` | `GJ` · `Marti` · `Vinícius` · `Gê` · `Léo` |
-| `clube` | `SPFC` (São Paulo) · `SCCP` (Corinthians) · `SEP` (Palmeiras) · `SFC` (Santos). Se o texto não for de um clube só — CBF, calendário, arbitragem —, **apague a linha inteira**: o artigo sai com o selo laranja `GERAL` e fica fora do filtro dos clubes |
-| `date` | Sempre `'ano-mês-dia'` com zero na frente: `'2026-03-05'`. Se for o segundo artigo do dia, ponha a hora junto para ele ficar na frente: `'2026-03-05 15:00'` — a hora não aparece no site, só ordena |
-
-### 4. Cole o texto embaixo
-
-Apague o exemplo e cole o artigo. Depois é só marcar os subtítulos com `##` e os
-negritos com `**duas estrelinhas**`. A cola completa está no fim do modelo.
-
-### 5. Capa: não precisa fazer nada
-
-Sem capa, o artigo recebe a arte padrão do VARzômetro automaticamente. Só mexa
-nisso se tiver uma imagem específica para aquele texto.
+O endereço da página (`/blog/...`) é criado a partir do título na primeira vez
+que você publica, e **fica fixo** depois disso — mesmo que você mude o título —,
+para não quebrar link já compartilhado. Escolha bem o título antes do primeiro
+**Publicar**.
 
 > ⚠️ **Cuidado com foto de jogo.** Imagem de agência (AFP, Getty, Reuters) ou
 > copiada de site de notícias é paga, e essas empresas cobram de quem usa sem
@@ -86,90 +59,70 @@ nisso se tiver uma imagem específica para aquele texto.
 > Sem licença, as opções seguras são: foto tirada por vocês, imagem de banco
 > livre, ou nenhuma capa (o artigo ganha a arte do VARzômetro).
 
-### 6. Suba para o ar
+---
 
-É o passo que faz o artigo existir de verdade — leia a seção abaixo.
+## Corrigindo ou tirando do ar
+
+- **Corrigir:** abra o artigo em **Meus artigos**, edite e clique em
+  **Atualizar artigo**. Muda no site na hora.
+- **Tirar do ar:** **Tirar do ar** volta o artigo para rascunho. A página sai do
+  blog; o texto continua guardado. Publicar de novo mantém a data original.
+- **Excluir:** apaga de vez. Não tem como desfazer.
 
 ---
 
-## ⚠️ Importante: como o artigo chega no ar
+## Seu perfil
 
-Salvar o arquivo no seu computador **não publica nada.**
+Em **Meu perfil** você muda nome, iniciais, clube, papel, função, bio e as duas
+fotos:
 
-Quando você roda o site aqui na sua máquina, salvar o arquivo muda a página na
-hora. Isso engana: no site de verdade **não funciona assim.**
+- **Foto do card da bancada:** vertical (3:4), rosto no terço de cima.
+- **Foto do avatar do blog:** quadrada, rosto no centro. Sem ela, o blog usa a
+  do card.
 
-O motivo: as páginas do blog são montadas uma vez, no momento em que o site é
-publicado. Depois disso o site no ar não volta mais na pasta para conferir se
-algo mudou. Só uma publicação nova regenera as páginas.
+O quadro ao lado mostra como o card vai ficar. Salvou, mudou na home e na
+assinatura de todos os seus artigos, inclusive os antigos.
 
-> É diferente dos vídeos do YouTube, que **aparecem sozinhos**. Aqueles o site
-> busca no canal enquanto está no ar. O blog não busca nada — ele já vem pronto.
-
-O caminho completo é:
-
-```
-você edita o arquivo  →  envia para o GitHub  →  a Vercel percebe
-                      →  publica de novo  →  no ar (cerca de 1 minuto)
-```
-
-O único passo manual é o de enviar para o GitHub. E é simples: tudo pelo
-navegador, sem programa e sem terminal.
-
-### Publicando pelo GitHub
-
-O repositório é **github.com/guilherme-oikos/site-varzometro** e o site no ar é
-**varzometro.com.br**.
-
-1. Entre no repositório no `github.com`
-2. Abra a pasta `content/posts`
-3. **Artigo novo:** botão `Add file` → `Create new file` → escreva o nome do
-   arquivo (`santos-na-vila.md`) → cole o conteúdo
-4. **Corrigir um artigo:** clique no arquivo → ícone de lápis → edite
-5. Botão verde `Commit changes`
-6. Espere cerca de um minuto e recarregue o site
-
-Corrigir um erro de digitação num artigo já publicado segue o mesmo caminho: edita,
-`Commit changes`, um minuto, pronto.
+Ordem dos cards e quem aparece na bancada ficam com o admin.
 
 ---
 
-## Antes de publicar, confira
+## Bolão
 
-- [ ] Nome do arquivo em minúsculas, sem acento, com hífen, terminando em `.md`
-- [ ] O arquivo está dentro de `content/posts/`
-- [ ] As duas linhas de `---` estão lá, uma no começo e uma no fim do cabeçalho
-- [ ] `author` escrito igualzinho, com acento (`Vinícius`, `Gê`)
-- [ ] `clube` em maiúsculas (`SPFC`, `SCCP`, `SEP`, `SFC`)
-- [ ] `date` no formato `'2026-09-10'` (com hora, `'2026-09-10 15:00'`, se já houver outro artigo nesse dia)
-- [ ] Título e resumo entre aspas
+1. Logado, abra **varzometro.com.br/bolao** (ou a aba **Bolão** do painel, que
+   leva para lá). Os jogos que ainda não começaram aparecem com os campos do
+   palpite. Abre na rodada atual; as setas trocam de rodada.
+2. Preencha o placar de cada jogo e clique em **Salvar palpites** (o botão fica
+   grudado no pé da tela). Dá para mudar quantas vezes quiser **até o apito
+   inicial** daquele jogo. Para desistir de um palpite, apague os dois números.
+3. Quando a bola rola, o seu palpite trava e aparece o de todo mundo, na mesma
+   página que qualquer pessoa vê. Antes disso, ninguém vê o seu, só que você já
+   palpitou.
+
+Pontos: **5** placar exato · **3** acertou o vencedor (ou o empate) e os gols de
+um dos times · **2** acertou o vencedor (ou o empate) · **1** errou o resultado,
+mas cravou os gols de um dos times.
 
 ---
 
 ## Se der errado
 
-**O artigo não apareceu no site.** Confira se o arquivo está em `content/posts/`
-e se termina em `.md`. Depois confira se você chegou a publicar (passo 6) — salvar
-não publica.
+**Esqueci a senha.** Fale com quem administra o site, ou mande e-mail para
+varzometropodcast@gmail.com.
 
-**O artigo apareceu sem o autor ou com a tag do clube errada.** Erro de digitação
-no cabeçalho. `author` e `clube` precisam ser exatamente um dos valores da tabela.
+**"Para publicar, o artigo precisa de título/texto".** Faltou um dos dois. O
+rascunho pode ficar incompleto; o publicado, não.
 
-**A página do artigo dá erro.** Quase sempre é aspas. Se o título tem apóstrofo
-(`O 'craque' sumiu`), troque as aspas de fora por aspas duplas:
+**A foto não sobe.** Tem que ser JPG, PNG ou WebP. O painel reduz o tamanho
+sozinho, então foto direto do celular funciona.
 
-```
-title: "O 'craque' sumiu"
-```
+**"Um jogo já tinha começado e o palpite dele não entrou".** Você salvou depois
+do apito. Os outros palpites foram salvos normalmente.
 
-**A data saiu errada no card.** O formato é ano-mês-dia: `'2026-03-05'` é 5 de
-março. `'2026-05-03'` seria 3 de maio.
-
-**A imagem não aparece.** Confira se o arquivo está em `public/blog/` e se o
-caminho no texto começa com `/blog/`. Se o caminho estiver errado, o artigo não
-quebra — ele mostra a arte padrão no lugar.
+**Mudei e não apareceu no site.** Recarregue a página do site (no celular,
+puxando para baixo). Se depois de um minuto ainda não mudou, avise o admin.
 
 ---
 
-Detalhes técnicos e as outras tarefas do site (episódios, cortes, imagens,
-deploy) estão no `README.md`.
+Detalhes técnicos estão no `README.md`; a configuração do login, no
+`SUPABASE.md`.

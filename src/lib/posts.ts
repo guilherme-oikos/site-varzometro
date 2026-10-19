@@ -1,9 +1,13 @@
+import 'server-only';
 import fs from 'fs';
 import path from 'path';
+import { cache } from 'react';
 import matter from 'gray-matter';
-import type { ClubeSigla } from '@/lib/site';
+import type { ClubeSigla, Convidado } from '@/lib/site';
 import { autoresDoBlog, siglaDeClube } from '@/lib/site';
 import { publicFileExists } from '@/lib/media';
+import { supabaseConfigurado } from '@/lib/supabase/config';
+import { supabasePublico } from '@/lib/supabase/publico';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
 
@@ -132,47 +136,179 @@ function iniciaisDoNome(nome: string): string {
   return nome.trim().slice(0, 2).toUpperCase();
 }
 
+/** O que cada fonte (arquivo ou banco) entrega antes de virar `Post`. */
+type Bruto = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  perfil?: Pick<Convidado, 'foto' | 'fotoBlog' | 'iniciais'>;
+  clube?: ClubeSigla;
+  cover?: string;
+  coverAlt?: string;
+  coverCredito?: string;
+  tags: string[];
+  content: string;
+};
+
+function montarPost(bruto: Bruto): Post {
+  // A capa só entra se o arquivo existir mesmo em /public. Assim um caminho
+  // digitado errado no cabeçalho não vira imagem quebrada no ar — ele cai na
+  // arte de reserva, igual a quem não declarou capa nenhuma. URL do Storage do
+  // Supabase passa direto (ver `publicFileExists`).
+  //
+  // A reserva também é verificada: se um dia o SVG sumir de /public, o card
+  // volta a aparecer sem capa em vez de pedir uma imagem que não existe.
+  const capaDeclarada = publicFileExists(bruto.cover) ? bruto.cover : undefined;
+  const reserva = publicFileExists(CAPA_PADRAO) ? CAPA_PADRAO : undefined;
+
+  const capa = capaDeclarada ?? reserva;
+  const capaPadrao = Boolean(capa) && capa === reserva;
+  const { perfil } = bruto;
+
+  return {
+    slug: bruto.slug,
+    title: bruto.title || bruto.slug,
+    excerpt: bruto.excerpt,
+    date: bruto.date,
+    dateLabel: formatDate(bruto.date),
+    author: bruto.author,
+    clube: bruto.clube,
+    cover: capa,
+    coverAlt: bruto.coverAlt || undefined,
+    coverCredito: bruto.coverCredito || undefined,
+    capaPadrao,
+    autorFoto: [perfil?.fotoBlog, perfil?.foto].find((foto) => publicFileExists(foto)),
+    autorIniciais: perfil?.iniciais ?? iniciaisDoNome(bruto.author),
+    tags: bruto.tags,
+    readingTime: calcReadingTime(bruto.content),
+    content: bruto.content,
+  };
+}
+
+/* ------------------------------------------------- Fonte 1: content/posts -- */
+
+/*
+ * Reserva para desenvolvimento sem Supabase configurado. Em produção os artigos
+ * vêm do banco; estes arquivos foram copiados para lá pelo
+ * `scripts/migrar-para-supabase.ts`.
+ */
 function readPostFile(fileName: string): Post {
   const slug = fileName.replace(/\.mdx?$/, '');
   const raw = fs.readFileSync(path.join(POSTS_DIR, fileName), 'utf8');
   const { data, content } = matter(raw);
 
-  // A capa só entra se o arquivo existir mesmo em /public. Assim um caminho
-  // digitado errado no cabeçalho não vira imagem quebrada no ar — ele cai na
-  // arte de reserva, igual a quem não declarou capa nenhuma.
-  //
-  // A reserva também é verificada: se um dia o SVG sumir de /public, o card
-  // volta a aparecer sem capa em vez de pedir uma imagem que não existe.
-  const declarada = data.cover ? String(data.cover) : undefined;
-  const capaDeclarada = publicFileExists(declarada) ? declarada : undefined;
-  const reserva = publicFileExists(CAPA_PADRAO) ? CAPA_PADRAO : undefined;
-
   const autor = String(data.author ?? 'Bancada VARzômetro');
-  // Procura na bancada e nos convidados: quem escreve no blog não é
-  // necessariamente integrante do programa.
-  const perfil = autoresDoBlog.find((pessoa) => pessoa.nome === autor);
 
-  const capa = capaDeclarada ?? reserva;
-  const capaPadrao = Boolean(capa) && capa === reserva;
-
-  return {
+  return montarPost({
     slug,
     title: String(data.title ?? slug),
     excerpt: String(data.excerpt ?? ''),
     date: normalizarData(data.date),
-    dateLabel: formatDate(normalizarData(data.date)),
     author: autor,
+    // Procura na bancada e nos convidados: quem escreve no blog não é
+    // necessariamente integrante do programa.
+    perfil: autoresDoBlog.find((pessoa) => pessoa.nome === autor),
     clube: siglaDeClube(data.clube),
-    cover: capa,
+    cover: data.cover ? String(data.cover) : undefined,
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     coverCredito: data.coverCredito ? String(data.coverCredito) : undefined,
-    capaPadrao,
-    autorFoto: [perfil?.fotoBlog, perfil?.foto].find((foto) => publicFileExists(foto)),
-    autorIniciais: perfil?.iniciais ?? iniciaisDoNome(autor),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-    readingTime: calcReadingTime(content),
     content,
-  };
+  });
+}
+
+function postsDosArquivos(): Post[] {
+  if (!fs.existsSync(POSTS_DIR)) return [];
+
+  return fs
+    .readdirSync(POSTS_DIR)
+    .filter((file) => /\.mdx?$/.test(file))
+    .map(readPostFile);
+}
+
+/* ------------------------------------------------------ Fonte 2: Supabase -- */
+
+/**
+ * `publicado_em` vem em UTC; o resto do arquivo trabalha com o texto
+ * `'AAAA-MM-DD HH:MM'` no horário de Brasília (ver `normalizarData`). O sueco
+ * (`sv-SE`) é o único locale que já formata nesse desenho.
+ */
+const horarioDeBrasilia = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'America/Sao_Paulo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+type LinhaArtigo = {
+  slug: string;
+  titulo: string;
+  resumo: string;
+  conteudo: string;
+  clube: string | null;
+  capa_url: string | null;
+  capa_alt: string | null;
+  capa_credito: string | null;
+  tags: string[] | null;
+  publicado_em: string;
+  autor: {
+    nome: string;
+    iniciais: string;
+    foto_url: string | null;
+    foto_blog_url: string | null;
+  } | null;
+};
+
+async function postsDoBanco(): Promise<Post[]> {
+  const { data, error } = await supabasePublico()
+    .from('artigos')
+    .select(
+      'slug, titulo, resumo, conteudo, clube, capa_url, capa_alt, capa_credito, tags, publicado_em, ' +
+        'autor:perfis!artigos_autor_id_fkey (nome, iniciais, foto_url, foto_blog_url)',
+    )
+    .eq('status', 'publicado')
+    .not('slug', 'is', null)
+    .returns<LinhaArtigo[]>();
+
+  /*
+   * Erro sobe em vez de virar lista vazia. Na revalidação, o Next mantém no ar
+   * a última versão boa da página; no build, o deploy falha e o anterior
+   * continua servindo. Lista vazia publicaria um blog sem artigo nenhum.
+   */
+  if (error) {
+    console.error(`[posts] Supabase recusou a consulta: ${error.message}`);
+    throw new Error(`[posts] falha ao ler artigos do Supabase: ${error.message}`);
+  }
+
+  console.info(`[posts] ${data.length} artigos lidos do Supabase.`);
+
+  return data.map((linha) =>
+    montarPost({
+      slug: linha.slug,
+      title: linha.titulo,
+      excerpt: linha.resumo,
+      date: horarioDeBrasilia.format(new Date(linha.publicado_em)),
+      author: linha.autor?.nome ?? 'Bancada VARzômetro',
+      perfil: linha.autor
+        ? {
+            iniciais: linha.autor.iniciais,
+            foto: linha.autor.foto_url ?? undefined,
+            fotoBlog: linha.autor.foto_blog_url ?? undefined,
+          }
+        : undefined,
+      clube: siglaDeClube(linha.clube),
+      cover: linha.capa_url ?? undefined,
+      coverAlt: linha.capa_alt ?? undefined,
+      coverCredito: linha.capa_credito ?? undefined,
+      tags: linha.tags ?? [],
+      content: linha.conteudo,
+    }),
+  );
 }
 
 /**
@@ -187,27 +323,22 @@ function readPostFile(fileName: string): Post {
  * de ordenação do Node. A versão anterior nunca devolvia 0 para datas iguais, e
  * dois artigos do mesmo dia saíam em ordem imprevisível.
  */
-export function getAllPosts(): Post[] {
-  if (!fs.existsSync(POSTS_DIR)) return [];
+export const getAllPosts = cache(async (): Promise<Post[]> => {
+  const posts = supabaseConfigurado ? await postsDoBanco() : postsDosArquivos();
+  return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+});
 
-  return fs
-    .readdirSync(POSTS_DIR)
-    .filter((file) => /\.mdx?$/.test(file))
-    .map(readPostFile)
-    .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+export async function getPostSlugs(): Promise<string[]> {
+  return (await getAllPosts()).map((post) => post.slug);
 }
 
-export function getPostSlugs(): string[] {
-  return getAllPosts().map((post) => post.slug);
-}
-
-export function getPostBySlug(slug: string): Post | undefined {
-  return getAllPosts().find((post) => post.slug === slug);
+export async function getPostBySlug(slug: string): Promise<Post | undefined> {
+  return (await getAllPosts()).find((post) => post.slug === slug);
 }
 
 /** Posts relacionados: mesmo clube primeiro, completando com os mais recentes. */
-export function getRelatedPosts(slug: string, limit = 3): PostMeta[] {
-  const all = getAllPosts();
+export async function getRelatedPosts(slug: string, limit = 3): Promise<PostMeta[]> {
+  const all = await getAllPosts();
   const current = all.find((post) => post.slug === slug);
   if (!current) return all.slice(0, limit);
 

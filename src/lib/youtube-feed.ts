@@ -1,5 +1,6 @@
 import 'server-only';
 import type { Corte, Episodio } from '@/lib/site';
+import { limparVariavel } from '@/lib/env';
 
 /**
  * Busca os vídeos do canal automaticamente, para o site se atualizar sozinho
@@ -17,19 +18,6 @@ import type { Corte, Episodio } from '@/lib/site';
  */
 
 const CANAL_PADRAO = 'UCq6n9H-_wGp-W8NZ_KTklhA';
-
-/**
- * Tira lixo de colagem de painel: espaço, quebra de linha e aspas em volta.
- *
- * Não é paranoia — foi bug real em produção. O `YOUTUBE_CHANNEL_ID` colado na
- * Vercel veio com caractere invisível grudado, o ID da playlist saiu malformado
- * e o Google respondeu `HTTP 400 invalid — Invalid Value`. Custou uma tarde,
- * porque 400 parece erro de chave e não é: chave recusada devolve 403.
- */
-function limparVariavel(bruto: string | undefined): string | undefined {
-  const limpo = bruto?.trim().replace(/^["']|["']$/g, '').trim();
-  return limpo || undefined;
-}
 
 const CANAL_BRUTO = limparVariavel(process.env.YOUTUBE_CHANNEL_ID);
 

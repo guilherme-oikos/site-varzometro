@@ -4,8 +4,8 @@ import SectionHeading from '@/components/SectionHeading';
 import { ArrowRightIcon, PenIcon } from '@/components/Icons';
 import { getAllPosts } from '@/lib/posts';
 
-export default function BlogSection() {
-  const posts = getAllPosts().slice(0, 3);
+export default async function BlogSection() {
+  const posts = (await getAllPosts()).slice(0, 3);
 
   return (
     <section id="blog" className="relative scroll-mt-24 py-20 sm:py-28">
@@ -43,9 +43,7 @@ export default function BlogSection() {
               Nenhum artigo publicado ainda.
             </p>
             <p className="max-w-sm text-sm text-muted">
-              Adicione um arquivo <code className="text-primary">.md</code> em{' '}
-              <code className="text-primary">/content/posts</code> e ele aparece
-              aqui automaticamente.
+              Os artigos da bancada aparecem aqui assim que forem publicados.
             </p>
           </div>
         )}

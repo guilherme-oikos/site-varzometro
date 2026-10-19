@@ -123,6 +123,10 @@ export default function Footer() {
               Política de Privacidade
             </Link>
             <span aria-hidden className="h-3 w-px bg-ink-line" />
+            {/*
+              Sem link para /login: a área da bancada não é para o leitor e
+              não tem cadastro público. Quem é da bancada entra pela URL.
+            */}
             <p>Feito para quem ama futebol sem filtro.</p>
           </div>
         </div>

@@ -2,10 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import remarkUnwrapImages from 'remark-unwrap-images';
 import PostCard from '@/components/PostCard';
-import { mdxComponents } from '@/components/MdxComponents';
+import CorpoDoArtigo from '@/components/CorpoDoArtigo';
 import { ArrowLeftIcon, ClockIcon } from '@/components/Icons';
 import {
   dataIso,
@@ -19,8 +17,19 @@ import { seloDoArtigo, site } from '@/lib/site';
 
 type Params = { params: { slug: string } };
 
-export function generateStaticParams() {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+export async function generateStaticParams() {
+  return (await getAllPosts()).map((post) => ({ slug: post.slug }));
+}
+
+/*
+ * Artigo publicado depois do deploy não está na lista acima. Com isto, ele é
+ * gerado no primeiro acesso e entra no cache — sem precisar de novo deploy.
+ */
+export const dynamicParams = true;
+
+/** Capa do Storage já vem com endereço completo; a de /public, não. */
+function urlAbsoluta(caminho: string): string {
+  return /^https?:\/\//.test(caminho) ? caminho : `${site.url}${caminho}`;
 }
 
 /*
@@ -38,8 +47,8 @@ function descricaoDoArtigo(post: Post): string {
   return post.excerpt || `${post.title} — análise da bancada do ${site.name}.`;
 }
 
-export function generateMetadata({ params }: Params): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug);
   if (!post) return { title: 'Artigo não encontrado' };
 
   const descricao = descricaoDoArtigo(post);
@@ -76,12 +85,12 @@ export function generateMetadata({ params }: Params): Metadata {
   };
 }
 
-export default function PostPage({ params }: Params) {
-  const post = getPostBySlug(params.slug);
+export default async function PostPage({ params }: Params) {
+  const post = await getPostBySlug(params.slug);
   if (!post) notFound();
 
   const selo = seloDoArtigo(post.clube);
-  const relacionados = getRelatedPosts(post.slug);
+  const relacionados = await getRelatedPosts(post.slug);
 
   const url = `${site.url}/blog/${post.slug}`;
   const publicado = dataIso(post.date);
@@ -96,7 +105,7 @@ export default function PostPage({ params }: Params) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: descricaoDoArtigo(post),
-    image: [`${site.url}${imagemDoArtigo(post)}`],
+    image: [urlAbsoluta(imagemDoArtigo(post))],
     datePublished: publicado,
     dateModified: publicado,
     inLanguage: 'pt-BR',
@@ -231,16 +240,7 @@ export default function PostPage({ params }: Params) {
         ) : null}
 
         <div className="article-body medida-prosa mx-auto mt-10">
-          {/*
-            remarkUnwrapImages tira o <p> que o Markdown coloca em volta de uma
-            imagem sozinha. Sem isso o <figure> ficaria dentro de <p>, que é HTML
-            inválido e quebra a hidratação do React.
-          */}
-          <MDXRemote
-            source={post.content}
-            components={mdxComponents}
-            options={{ mdxOptions: { remarkPlugins: [remarkUnwrapImages] } }}
-          />
+          <CorpoDoArtigo conteudo={post.content} />
         </div>
 
         <div className="medida-prosa mx-auto mt-14 rounded-2xl border border-primary/25 bg-primary/[0.06] p-7 text-center sm:p-9">
