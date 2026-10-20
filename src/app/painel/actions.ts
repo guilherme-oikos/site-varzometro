@@ -3,7 +3,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { RESENHA_MAX, type StatusJogo } from '@/lib/bolao';
-import { AVISO_DOIS_FATORES, RESPONSAVEIS, USUARIOS_TRAVADOS, type Responsavel } from '@/lib/brincadeira';
 import { sincronizarBolao } from '@/lib/bolao-sync';
 import { exigirSessao } from '@/lib/painel';
 import { supabaseServidor } from '@/lib/supabase/server';
@@ -13,11 +12,8 @@ import { emailDoUsuario, normalizarUsuario, usuarioValido } from '@/lib/usuario'
 
 export type Resultado =
   | { ok: true; mensagem: string; slug?: string | null }
-  /**
-   * `esperar`: segundos até poder tentar de novo (limite por minuto do football-data).
-   * `dois_fatores`: a brincadeira do login do Gê (ver src/lib/brincadeira.ts).
-   */
-  | { ok: false; erro: string; esperar?: number; dois_fatores?: { responsaveis: Responsavel[] } };
+  /** `esperar`: segundos até poder tentar de novo (limite por minuto do football-data). */
+  | { ok: false; erro: string; esperar?: number };
 
 /** Página pública e painel se refazem na hora depois de salvar. */
 function atualizarSite() {
@@ -73,12 +69,6 @@ export async function entrar(_anterior: Resultado | null, dados: FormData): Prom
   // Mensagem única para usuário inexistente e senha errada: dizer qual dos dois
   // falhou ajudaria quem está tentando adivinhar conta alheia.
   if (error) return { ok: false, erro: 'Usuário ou senha não conferem.' };
-
-  // Brincadeira: a senha confere, mas a sessão é desfeita e entra o "2FA".
-  if (USUARIOS_TRAVADOS.includes(usuario)) {
-    await supabaseServidor().auth.signOut();
-    return { ok: false, erro: AVISO_DOIS_FATORES, dois_fatores: { responsaveis: RESPONSAVEIS } };
-  }
 
   redirect('/painel');
 }
