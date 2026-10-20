@@ -55,7 +55,7 @@ a Vercel, nunca vai para o git e nunca ganha prefixo `NEXT_PUBLIC_`.
 ## 5. Criar as contas e migrar o conteúdo atual
 
 Roda na sua máquina, uma vez. Cria o login de cada integrante, copia as fotos e
-os 11 artigos para o Supabase mantendo os mesmos endereços (`/blog/...`), para
+os artigos para o Supabase mantendo os mesmos endereços (`/blog/...`), para
 nenhum link já compartilhado quebrar.
 
 1. Crie o `.env.local` na raiz (copie de `.env.example`) com as três variáveis
@@ -72,7 +72,7 @@ nenhum link já compartilhado quebrar.
    npm run migrar
    ```
 
-   Deve terminar com `Pronto: 5 perfis e 11 artigos.`
+   Deve terminar com `Pronto: 5 perfis e 6 artigos.`
 4. Teste local: `npm run dev`, abra <http://localhost:3000/login> e entre com
    uma das contas.
 5. Apague o `scripts/contas.json` depois e mande a senha provisória para cada um
@@ -157,7 +157,7 @@ Como funciona no dia a dia:
 
 ## 8. Conferir em produção
 
-- <https://www.varzometro.com.br/blog> mostra os 11 artigos, com capa.
+- <https://www.varzometro.com.br/blog> mostra os 6 artigos, com capa.
 - <https://www.varzometro.com.br/login> → login → **Meu perfil** → mude a bio,
   salve, e veja o card mudar na home (pode levar alguns segundos).
 - **Novo artigo** → escreva → **Publicar** → aparece no blog sem novo deploy.
