@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { EVENTO_ATUALIZAR } from '@/components/bolao/AtualizarAoVivo';
 import EsqueletoJogos from '@/components/bolao/EsqueletoJogos';
 import type { AutorDoBolao } from '@/lib/bolao';
 import type { MeuBolao } from '@/lib/bolao-logado';
@@ -15,6 +16,9 @@ const FormPalpites = dynamic(carregarFormulario, {
   loading: () => <EsqueletoJogos variante="logado" quantidade={3} />,
 });
 const BotaoAtualizarJogos = dynamic(() => import('@/components/painel/BotaoAtualizarJogos'));
+// Um só <Toaster> para o salvar palpites e o "Atualizar jogos agora" (dois
+// duplicariam cada aviso). Fora do layout: só quem está logado baixa o Sonner.
+const Toaster = dynamic(() => import('@/components/ui/sonner').then((m) => m.Toaster));
 
 const dataHora = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -40,7 +44,10 @@ const dataHora = new Intl.DateTimeFormat('pt-BR', {
  *
  * Se a última busca de placar já passou do intervalo, chama
  * `/api/bolao/atualizar` depois, sem ninguém esperar por ela; trouxe placar
- * novo, a página se refaz. Detalhes em `src/lib/bolao-logado.ts`.
+ * novo, a página se refaz. Detalhes em `src/lib/bolao-logado.ts`. Com jogo
+ * rolando, `AtualizarAoVivo` repete isso a cada minuto e avisa por evento; aí
+ * os dados daqui são relidos, para o placar parcial chegar também nos cards
+ * do formulário.
  *
  * O admin ganha aqui o "Atualizar jogos agora" e a correção de cada jogo.
  */
@@ -102,7 +109,18 @@ export default function PalpitesDoLogado({
         if (!controle.signal.aborted) setEstado('publico');
       });
 
-    return () => controle.abort();
+    // Falhou uma releitura no meio do jogo: fica o que já está na tela.
+    const reler = () => {
+      ler()
+        .then((dados) => dados && setMeu(dados))
+        .catch(() => {});
+    };
+    window.addEventListener(EVENTO_ATUALIZAR, reler);
+
+    return () => {
+      controle.abort();
+      window.removeEventListener(EVENTO_ATUALIZAR, reler);
+    };
   }, [filtro, router]);
 
   if (estado === 'publico' || (estado === 'logado' && !meu)) return <>{children}</>;
@@ -120,6 +138,7 @@ export default function PalpitesDoLogado({
 
   return (
     <>
+      <Toaster />
       {meu.admin ? (
         <div className="card mb-5 flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
           <p className="text-sm text-muted">

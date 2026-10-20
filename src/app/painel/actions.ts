@@ -10,7 +10,10 @@ import { TAG_BOLAO, TAG_CONTEUDO } from '@/lib/supabase/config';
 import { siglaDeClube } from '@/lib/site';
 import { emailDoUsuario, normalizarUsuario, usuarioValido } from '@/lib/usuario';
 
-export type Resultado = { ok: true; mensagem: string; slug?: string | null } | { ok: false; erro: string };
+export type Resultado =
+  | { ok: true; mensagem: string; slug?: string | null }
+  /** `esperar`: segundos até poder tentar de novo (limite por minuto do football-data). */
+  | { ok: false; erro: string; esperar?: number };
 
 /** Página pública e painel se refazem na hora depois de salvar. */
 function atualizarSite() {
@@ -368,12 +371,23 @@ export async function atualizarJogos(): Promise<Resultado> {
   if (!perfil?.is_admin) return { ok: false, erro: 'Só o admin atualiza os jogos.' };
 
   const resultado = await sincronizarBolao(supabase);
-  if (!resultado.ok) return { ok: false, erro: `Não deu para atualizar: ${resultado.erro}` };
+  if (!resultado.ok) {
+    if (resultado.esperar !== undefined) {
+      return {
+        ok: false,
+        erro: `O football-data só aceita 10 buscas por minuto e o limite estourou. Dá para tentar de novo em ${resultado.esperar}s.`,
+        esperar: resultado.esperar,
+      };
+    }
+    return { ok: false, erro: resultado.erro };
+  }
 
   atualizarBolao();
   return {
     ok: true,
-    mensagem: `Jogos atualizados: ${resultado.recebidos} na temporada, ${resultado.gravados} gravados no bolão.`,
+    // Jogo que já está no bolão é regravado toda vez, então "gravados" é o
+    // total do bolão, não só o que mudou (ver `bolao_sincronizar`).
+    mensagem: `${resultado.gravados} jogos do bolão conferidos com o football-data (${resultado.recebidos} na temporada).`,
   };
 }
 

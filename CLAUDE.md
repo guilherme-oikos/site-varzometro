@@ -79,7 +79,12 @@ O conteúdo vem de cinco fontes:
 Componentes são server components por padrão. No site público, os
 `'use client'` são `Header` (menu), `CarrosselMidia` (abas/carrossel),
 `FloatingCTA` (scroll) e, no bolão, `Escudo` (`onError`), `SeletorRodada`
-(esqueleto dos jogos no instante da troca de rodada), `GraficoEvolucao`
+(esqueleto dos jogos no instante da troca de rodada), `AlternarRanking`
+(ranking oficial ou "se acabasse agora"), `AtualizarAoVivo` (com jogo rolando,
+refaz a página a cada minuto; logado também pede `/api/bolao/atualizar`,
+visitante nunca dispara football-data), `DueloDaBancada` (escolha da dupla
+por clique ou arrastar; a conta do duelo roda no navegador e o endereço
+acompanha), `GraficoEvolucao`
 (gráfico no padrão do shadcn/ui: Recharts + `src/components/ui/chart.tsx`,
 adaptado aos tokens do site; o Recharts só baixa no navegador, por
 `next/dynamic`) e `PalpitesDoLogado` (o palpite é no próprio `/bolao`,
@@ -113,7 +118,13 @@ saem de `bolao_pontos` — painel, página pública e ranking leem as views
 `bolao_palpites_pontuados` e `bolao_ranking` (`security_invoker`, respeitam a
 RLS). `src/lib/bolao.ts` repete a regra só para a tela; mudou no SQL, mude o
 texto de `REGRAS` (e `REGRA_ZEBRA`). Resenha e zebra (`0004_resenha_e_zebra.sql`)
-moram na linha do palpite para herdar prazo e sigilo da RLS; uma zebra por
+moram na linha do palpite para herdar prazo e sigilo da RLS.
+**Placar parcial:** com o jogo `ao_vivo`, a sincronização grava o placar do
+momento em `gols_mandante`/`gols_visitante` — não pontua nada porque as views
+só contam jogo `encerrado`. O ranking "se acabasse agora" e os selos tracejados
+do card são prévia na tela (`palpitesAoVivo` + `somarNoRanking`, com
+`pontosDoPalpite` repetindo `bolao_pontos`): mudou a regra no SQL, mude lá
+também. Para testar sem jogo real, `BOLAO_SIMULAR=<id>:1x0:vivo`. Uma zebra por
 rodada é o trigger `bolao_uma_zebra_por_rodada`. `pontos` já vem dobrado pela
 zebra e `pontos_base` é a faixa da regra: exato, resultado certo e as colunas
 +5/+3/+2/+1 contam pela base, nunca por `pontos`. A leitura dos palpites é

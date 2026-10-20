@@ -208,3 +208,15 @@ export const getTimePublico = cache(async (slug: string) => {
   const dados = await lerJogos(supabasePublico('bolao'), bolao, jogos.map((jogo) => jogo.id));
   return { bolao, time, jogos, dados };
 });
+
+/**
+ * Palpites de todos os jogos rolando agora, de qualquer rodada (um jogo
+ * remarcado pode cair no meio de outra) — base do ranking "se acabasse agora".
+ * Já estão à mostra: a bola rolou.
+ */
+export const getPalpitesAoVivoPublico = cache(async (): Promise<Palpite[]> => {
+  const bolao = await getBolaoPublico();
+  const ids = bolao?.jogos.filter((jogo) => jogo.status === 'ao_vivo').map((jogo) => jogo.id) ?? [];
+  if (!bolao || ids.length === 0) return [];
+  return (await lerJogos(supabasePublico('bolao'), bolao, ids)).palpites;
+});

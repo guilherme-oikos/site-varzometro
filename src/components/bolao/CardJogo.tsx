@@ -3,6 +3,7 @@ import AvatarAutor from '@/components/painel/AvatarAutor';
 import Escudo from '@/components/bolao/Escudo';
 import SeloPontos from '@/components/bolao/SeloPontos';
 import {
+  palpitesAoVivo,
   palpitesVisiveis,
   placar,
   quandoE,
@@ -17,7 +18,8 @@ import {
  *
  * Antes do apito, os palpites dos outros não chegam aqui (a RLS não devolve):
  * o card só diz quantos já palpitaram. Depois do apito, mostra o de cada um e,
- * com o jogo encerrado, os pontos.
+ * com o jogo encerrado, os pontos. Rolando, o placar do meio é o de agora e o
+ * selo tracejado diz quanto cada palpite faria se o jogo acabasse ali.
  *
  * Sem 'use client' e sem nada de servidor: a página pública usa direto, e o
  * formulário do painel passa os campos do palpite em `centro`.
@@ -52,6 +54,7 @@ export default function CardJogo({
   const fora = jogo.status === 'adiado' || jogo.status === 'cancelado';
 
   const jaPalpitaram = autores.filter((autor) => quemPalpitou.includes(autor.id)).length;
+  const previa = palpitesAoVivo([jogo], palpites);
 
   const status = rolando ? 'Rolando' : jogo.status === 'agendado' ? null : rotuloStatus[jogo.status];
 
@@ -82,7 +85,9 @@ export default function CardJogo({
 
         <div className="flex justify-center">
           {centro ?? (
-            <span className={`numerico text-xl font-extrabold ${resultado ? 'text-white' : 'text-zinc-600'}`}>
+            <span
+              className={`numerico text-xl font-extrabold ${resultado ? (jogo.status === 'ao_vivo' ? 'text-primary' : 'text-white') : 'text-zinc-600'}`}
+            >
               {resultado ?? 'x'}
             </span>
           )}
@@ -107,6 +112,7 @@ export default function CardJogo({
             <ul className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {autores.map((autor) => {
                 const palpite = palpites.find((p) => p.autor_id === autor.id);
+                const agoraFaria = previa.find((p) => p.autor_id === autor.id);
                 const meu = autor.id === meuId;
                 return (
                   <li key={autor.id} className="text-sm">
@@ -128,7 +134,11 @@ export default function CardJogo({
                           <span className="numerico font-bold text-white">
                             {palpite.gols_mandante} x {palpite.gols_visitante}
                           </span>
-                          <SeloPontos pontos={palpite.pontos} base={palpite.pontos_base} />
+                          {agoraFaria ? (
+                            <SeloPontos pontos={agoraFaria.pontos} base={agoraFaria.pontos_base} provisorio />
+                          ) : (
+                            <SeloPontos pontos={palpite.pontos} base={palpite.pontos_base} />
+                          )}
                         </>
                       ) : (
                         <span className="text-xs text-zinc-600">sem palpite</span>

@@ -10,14 +10,28 @@ import { seloDoArtigo, siglaDeClube } from '@/lib/site';
  * Uma coluna por faixa de `REGRAS` (+5, +3, +2, +1), com o mesmo selo do
  * "Como pontua" no cabeçalho, para dar para ler de onde saiu cada ponto. Zero
  * fica apagado, para o que a pessoa acertou saltar aos olhos.
+ *
+ * Com `oficial`, a tabela é a prévia "se acabasse agora": cada linha mostra
+ * quantas posições subiu ou desceu e quantos pontos os jogos rolando dariam.
  */
-export default function TabelaRanking({ ranking, meuId }: { ranking: LinhaRanking[]; meuId?: string }) {
+export default function TabelaRanking({
+  ranking,
+  meuId,
+  oficial,
+}: {
+  ranking: LinhaRanking[];
+  meuId?: string;
+  /** O ranking que vale, para comparar com a prévia ao vivo. */
+  oficial?: LinhaRanking[];
+}) {
   if (ranking.length === 0) {
     return <p className="card p-6 text-sm text-muted">Ninguém pontuou ainda. O ranking abre no primeiro jogo encerrado.</p>;
   }
 
   const lugares = posicoes(ranking);
   const lider = ranking[0].pontos > 0 ? ranking[0].pontos : null;
+  const lugaresOficiais = oficial ? posicoes(oficial) : [];
+  const antes = new Map(oficial?.map((linha, i) => [linha.autor_id, { lugar: lugaresOficiais[i], pontos: linha.pontos }]));
 
   return (
     <div className="card overflow-hidden">
@@ -41,10 +55,22 @@ export default function TabelaRanking({ ranking, meuId }: { ranking: LinhaRankin
             const selo = seloDoArtigo(siglaDeClube(linha.clube));
             const lidera = lider !== null && linha.pontos === lider;
             const vezes = vezesPorFaixa(linha);
+            const antesDele = antes.get(linha.autor_id);
+            const subiu = antesDele ? antesDele.lugar - lugares[indice] : 0;
+            const ganha = antesDele ? linha.pontos - antesDele.pontos : 0;
             return (
               <tr key={linha.autor_id} className={meu ? 'bg-primary/[0.06]' : undefined}>
                 <td className={`numerico py-3 pl-3 font-extrabold sm:pl-5 ${lidera ? 'text-primary' : 'text-zinc-400'}`}>
                   {lugares[indice]}º
+                  {subiu !== 0 ? (
+                    <span
+                      title={`${subiu > 0 ? 'Sobe' : 'Desce'} ${Math.abs(subiu)} se acabasse agora`}
+                      className={`block text-[0.625rem] font-bold leading-none ${subiu > 0 ? 'text-primary' : 'text-zinc-500'}`}
+                    >
+                      {subiu > 0 ? '▲' : '▼'}
+                      {Math.abs(subiu)}
+                    </span>
+                  ) : null}
                 </td>
                 <td className="max-w-0 py-3 pr-1">
                   <div className="flex min-w-0 items-center gap-2">
@@ -75,7 +101,12 @@ export default function TabelaRanking({ ranking, meuId }: { ranking: LinhaRankin
                     </td>
                   );
                 })}
-                <td className="numerico py-3 pl-2 pr-3 text-right text-lg font-extrabold text-white sm:pr-5">{linha.pontos}</td>
+                <td className="numerico py-3 pl-2 pr-3 text-right text-lg font-extrabold text-white sm:pr-5">
+                  {linha.pontos}
+                  {ganha > 0 ? (
+                    <span className="block text-[0.625rem] font-bold leading-none text-primary">+{ganha}</span>
+                  ) : null}
+                </td>
               </tr>
             );
           })}

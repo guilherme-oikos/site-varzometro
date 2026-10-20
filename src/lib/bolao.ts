@@ -2,10 +2,11 @@
  * Tipos e textos do bolão. Puro, sem `fs` nem Supabase: pode ser importado por
  * componente 'use client'.
  *
- * A conta dos pontos não mora aqui: é `bolao_pontos` no banco
+ * A conta dos pontos que valem não mora aqui: é `bolao_pontos` no banco
  * (supabase/migrations/0002_bolao.sql), para painel, página pública e ranking
- * nunca discordarem. `REGRAS` só descreve a regra na tela — se mudar lá, mude
- * aqui.
+ * nunca discordarem. `REGRAS` só descreve a regra na tela, e
+ * `pontosDoPalpite` repete a conta só para a prévia ao vivo — se mudar lá,
+ * mude os dois aqui.
  */
 
 import type { ClubeSigla } from '@/lib/site';
@@ -106,9 +107,79 @@ export function palpitesVisiveis(jogo: Jogo, agora = Date.now()): boolean {
   );
 }
 
+/** Placar final, ou o do momento se o jogo está rolando (a sincronização grava o parcial). */
 export function placar(jogo: Pick<Jogo, 'gols_mandante' | 'gols_visitante'>): string | null {
   if (jogo.gols_mandante === null || jogo.gols_visitante === null) return null;
   return `${jogo.gols_mandante} x ${jogo.gols_visitante}`;
+}
+
+/* ------------------------------------------------------------- Ao vivo -- */
+/*
+ * "Se acabasse agora": os pontos que cada palpite faria com o placar parcial.
+ * É só prévia na tela. O ranking que vale continua sendo o da view
+ * `bolao_ranking`, que só pontua jogo encerrado.
+ */
+
+/** Mesma conta de `bolao_pontos` no SQL. Só para prévia: quem pontua de verdade é o banco. */
+export function pontosDoPalpite(pm: number, pv: number, gm: number, gv: number): number {
+  if (pm === gm && pv === gv) return 5;
+  const mesmoResultado = Math.sign(pm - pv) === Math.sign(gm - gv);
+  if (mesmoResultado && (pm === gm || pv === gv)) return 3;
+  if (mesmoResultado) return 2;
+  if (pm === gm || pv === gv) return 1;
+  return 0;
+}
+
+/** Jogo rolando, com o placar de agora. Sem placar ainda (a API demora no apito), vale 0 x 0. */
+export function placarParcial(jogo: Jogo): { mandante: number; visitante: number } | null {
+  if (jogo.status !== 'ao_vivo') return null;
+  return { mandante: jogo.gols_mandante ?? 0, visitante: jogo.gols_visitante ?? 0 };
+}
+
+/** Os palpites dos jogos rolando com os pontos que fariam se o jogo acabasse agora (zebra incluída). */
+export function palpitesAoVivo(jogos: Jogo[], palpites: Palpite[]): Palpite[] {
+  const parciais = new Map(jogos.flatMap((jogo) => {
+    const parcial = placarParcial(jogo);
+    return parcial ? [[jogo.id, parcial] as const] : [];
+  }));
+  return palpites.flatMap((p) => {
+    const parcial = parciais.get(p.jogo_id);
+    if (!parcial) return [];
+    const base = pontosDoPalpite(p.gols_mandante, p.gols_visitante, parcial.mandante, parcial.visitante);
+    return [{ ...p, pontos: base * (p.dobrado ? 2 : 1), pontos_base: base }];
+  });
+}
+
+/**
+ * Soma palpites pontuados fora do banco (a prévia ao vivo, a simulação do dev)
+ * no ranking: total com a zebra, faixas pela regra sem ela, como a view. E
+ * reordena como a consulta de `lerBolao`.
+ */
+export function somarNoRanking(ranking: LinhaRanking[], extras: Palpite[]): LinhaRanking[] {
+  return ranking
+    .map((linha) => {
+      const meus = extras.filter((palpite) => palpite.autor_id === linha.autor_id && palpite.pontos !== null);
+      if (meus.length === 0) return linha;
+      const conta = (n: number) => meus.filter((p) => p.pontos_base === n).length;
+      return {
+        ...linha,
+        pontos: linha.pontos + meus.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
+        exatos: linha.exatos + conta(5),
+        resultados: linha.resultados + meus.filter((p) => (p.pontos_base ?? 0) >= 2).length,
+        jogos_pontuados: linha.jogos_pontuados + meus.length,
+        vencedor_e_gols: (linha.vencedor_e_gols ?? 0) + conta(3),
+        so_vencedor: (linha.so_vencedor ?? 0) + conta(2),
+        so_gols: (linha.so_gols ?? 0) + conta(1),
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.pontos - a.pontos ||
+        b.exatos - a.exatos ||
+        b.resultados - a.resultados ||
+        a.ordem - b.ordem ||
+        a.nome.localeCompare(b.nome),
+    );
 }
 
 export const rotuloStatus: Record<StatusJogo, string> = {
@@ -392,11 +463,6 @@ export type Duelo = {
 export function slugDoDuelo(a: AutorDoBolao, b: AutorDoBolao, autores: AutorDoBolao[]): string {
   const [primeiro, segundo] = autores.indexOf(a) <= autores.indexOf(b) ? [a, b] : [b, a];
   return `${paraSlug(primeiro.nome)}-x-${paraSlug(segundo.nome)}`;
-}
-
-/** Todas as duplas da bancada, na ordem dos cards (5 pessoas, 10 duelos). */
-export function duplas(autores: AutorDoBolao[]): [AutorDoBolao, AutorDoBolao][] {
-  return autores.flatMap((a, i) => autores.slice(i + 1).map((b) => [a, b] as [AutorDoBolao, AutorDoBolao]));
 }
 
 /**

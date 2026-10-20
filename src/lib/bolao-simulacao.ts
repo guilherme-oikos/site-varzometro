@@ -1,6 +1,6 @@
 import 'server-only';
 import type { Bolao, Rodada } from '@/lib/bolao-dados';
-import type { Palpite } from '@/lib/bolao';
+import { pontosDoPalpite, somarNoRanking, type Palpite } from '@/lib/bolao';
 import { limparVariavel } from '@/lib/env';
 
 /**
@@ -11,24 +11,29 @@ import { limparVariavel } from '@/lib/env';
  * no campeão da rodada, na evolução e no "próprio time". Serve para ver a
  * tela antes de as rodadas terminarem de verdade.
  *
+ * Com `:vivo` no fim (`555044:1x0:vivo`), o jogo aparece rolando com esse
+ * placar parcial: palpites à mostra, sem pontos, e o ranking "se acabasse
+ * agora" ligado.
+ *
  * Nada vai para o banco: o Supabase é o de produção, e encerrar um jogo real
  * revelaria os palpites para sempre (o trigger não deixa `revelado` voltar).
  * Em build de produção a variável é ignorada.
  */
 
-type JogoSimulado = { jogoId: number; mandante: number; visitante: number };
+type JogoSimulado = { jogoId: number; mandante: number; visitante: number; vivo: boolean };
 
 const simulados: JogoSimulado[] = (() => {
   if (process.env.NODE_ENV === 'production') return [];
   const bruto = limparVariavel(process.env.BOLAO_SIMULAR);
   if (!bruto) return [];
   const lista = bruto.split(',').flatMap((item) => {
-    const partes = item.trim().match(/^(\d+)(?::(\d+)x(\d+))?$/i);
+    const partes = item.trim().match(/^(\d+)(?::(\d+)x(\d+))?(:vivo)?$/i);
     if (!partes) return [];
     return [{
       jogoId: Number(partes[1]),
       mandante: partes[2] ? Number(partes[2]) : 2,
       visitante: partes[3] ? Number(partes[3]) : 1,
+      vivo: Boolean(partes[4]),
     }];
   });
   if (lista.length > 0) {
@@ -38,16 +43,6 @@ const simulados: JogoSimulado[] = (() => {
 })();
 
 const simulado = (jogoId: number) => simulados.find((s) => s.jogoId === jogoId);
-
-/** Mesma conta de `bolao_pontos` no SQL. */
-function pontos(pm: number, pv: number, gm: number, gv: number): number {
-  if (pm === gm && pv === gv) return 5;
-  const mesmoResultado = Math.sign(pm - pv) === Math.sign(gm - gv);
-  if (mesmoResultado && (pm === gm || pv === gv)) return 3;
-  if (mesmoResultado) return 2;
-  if (pm === gm || pv === gv) return 1;
-  return 0;
-}
 
 // Um palpite por faixa de pontos (5, 3, 2, 1, 0), montado a partir do placar.
 // Em empate não existe a faixa de 3 (acertar o empate e um dos gols é exato).
@@ -82,13 +77,14 @@ function palpitesSimulados(bolao: Bolao): Palpite[] {
         const chave = `${autor.autor_id}:${rodadaDe.get(s.jogoId)}`;
         const dobrado = (i + k) % 2 === 0 && !zebraUsada.has(chave);
         if (dobrado) zebraUsada.add(chave);
-        const pontosBase = pontos(m, v, s.mandante, s.visitante);
+        // Rolando, o banco ainda não deu ponto: a prévia sai de `palpitesAoVivo`.
+        const pontosBase = s.vivo ? null : pontosDoPalpite(m, v, s.mandante, s.visitante);
         return {
           jogo_id: s.jogoId,
           autor_id: autor.autor_id,
           gols_mandante: m,
           gols_visitante: v,
-          pontos: pontosBase * (dobrado ? 2 : 1),
+          pontos: pontosBase === null ? null : pontosBase * (dobrado ? 2 : 1),
           pontos_base: pontosBase,
           resenha: (i + k) % 3 === 0 ? RESENHAS[(i + k) % RESENHAS.length] : null,
           dobrado,
@@ -103,37 +99,18 @@ export function simularBolao(bolao: Bolao): Bolao {
   const jogos = bolao.jogos.map((jogo) => {
     const s = simulado(jogo.id);
     return s
-      ? { ...jogo, status: 'encerrado' as const, gols_mandante: s.mandante, gols_visitante: s.visitante, revelado: true }
+      ? {
+          ...jogo,
+          status: s.vivo ? ('ao_vivo' as const) : ('encerrado' as const),
+          gols_mandante: s.mandante,
+          gols_visitante: s.visitante,
+          revelado: true,
+        }
       : jogo;
   });
 
-  const extras = palpitesSimulados(bolao);
-  const ranking = bolao.ranking
-    .map((linha) => {
-      const meus = extras.filter((palpite) => palpite.autor_id === linha.autor_id);
-      if (meus.length === 0) return linha;
-      // Total com a zebra; faixas pela regra, sem ela — como a view do banco.
-      const conta = (n: number) => meus.filter((p) => p.pontos_base === n).length;
-      return {
-        ...linha,
-        pontos: linha.pontos + meus.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
-        exatos: linha.exatos + conta(5),
-        resultados: linha.resultados + meus.filter((p) => (p.pontos_base ?? 0) >= 2).length,
-        jogos_pontuados: linha.jogos_pontuados + meus.length,
-        vencedor_e_gols: (linha.vencedor_e_gols ?? 0) + conta(3),
-        so_vencedor: (linha.so_vencedor ?? 0) + conta(2),
-        so_gols: (linha.so_gols ?? 0) + conta(1),
-      };
-    })
-    // Mesma ordem da consulta em `lerBolao`.
-    .sort(
-      (a, b) =>
-        b.pontos - a.pontos ||
-        b.exatos - a.exatos ||
-        b.resultados - a.resultados ||
-        a.ordem - b.ordem ||
-        a.nome.localeCompare(b.nome),
-    );
+  // Só os encerrados somam no ranking oficial; `somarNoRanking` ignora palpite sem pontos.
+  const ranking = somarNoRanking(bolao.ranking, palpitesSimulados(bolao));
 
   return { ...bolao, jogos, ranking };
 }

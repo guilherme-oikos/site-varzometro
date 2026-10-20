@@ -86,7 +86,29 @@ export type JogoParaGravar = {
   gols_visitante: number | null;
 };
 
-export type ResultadoSync = { ok: true; gravados: number; recebidos: number } | { ok: false; erro: string };
+export type ResultadoSync =
+  | { ok: true; gravados: number; recebidos: number }
+  /** `esperar`: estourou o limite por minuto do football-data; segundos até liberar de novo. */
+  | { ok: false; erro: string; esperar?: number };
+
+/** O football-data recusou por limite (HTTP 429). */
+class LimiteDaApi extends Error {
+  constructor(readonly esperar: number) {
+    super(`football-data: limite de consultas por minuto, libera em ${esperar}s.`);
+  }
+}
+
+/**
+ * Segundos até o football-data liberar de novo. Vem no cabeçalho
+ * `X-RequestCounter-Reset`; sem ele, o texto de lá ("Wait 42 seconds"); sem
+ * nenhum dos dois, o minuto cheio.
+ */
+function segundosParaLiberar(resposta: Response, corpo: string): number {
+  const cabecalho = Number(resposta.headers.get('x-requestcounter-reset'));
+  if (Number.isFinite(cabecalho) && cabecalho > 0) return Math.ceil(cabecalho);
+  const noTexto = corpo.match(/wait (\d+) seconds?/i);
+  return noTexto ? Number(noTexto[1]) : 60;
+}
 
 /**
  * Do endereço do escudo fica só o nome do arquivo, e só se for do servidor de
@@ -128,10 +150,12 @@ function traduzir(jogo: JogoDaApi): JogoParaGravar | null {
     visitante_escudo: arquivoDoEscudo(jogo.awayTeam.crest),
     inicio: jogo.utcDate,
     status,
-    // O placar parcial também vem em `fullTime` durante o jogo. Só interessa
-    // gravado quando acaba; antes disso a tela mostra "Rolando".
-    gols_mandante: status === 'encerrado' ? (jogo.score?.fullTime?.home ?? null) : null,
-    gols_visitante: status === 'encerrado' ? (jogo.score?.fullTime?.away ?? null) : null,
+    // Durante o jogo, `fullTime` traz o placar do momento. Gravar não mexe no
+    // ranking: as views só pontuam jogo `encerrado`. É o que alimenta o placar
+    // parcial no card e o ranking "se acabasse agora" (`palpitesAoVivo`).
+    // Adiado no meio do jogo volta a não ter placar.
+    gols_mandante: status === 'encerrado' || status === 'ao_vivo' ? (jogo.score?.fullTime?.home ?? null) : null,
+    gols_visitante: status === 'encerrado' || status === 'ao_vivo' ? (jogo.score?.fullTime?.away ?? null) : null,
   };
 }
 
@@ -149,6 +173,7 @@ export async function buscarJogosDaApi(): Promise<JogoParaGravar[]> {
   if (!resposta.ok) {
     // 403 é token recusado ou competição fora do plano; 429 é limite por minuto.
     const corpo = await resposta.text().catch(() => '');
+    if (resposta.status === 429) throw new LimiteDaApi(segundosParaLiberar(resposta, corpo));
     throw new Error(`football-data respondeu HTTP ${resposta.status}: ${corpo.slice(0, 200)}`);
   }
 
@@ -192,7 +217,7 @@ export async function sincronizarBolao(cliente?: SupabaseClient): Promise<Result
   } catch (erro) {
     const mensagem = erro instanceof Error ? erro.message : String(erro);
     console.error(`[bolao] sincronização falhou: ${mensagem}`);
-    return { ok: false, erro: mensagem };
+    return { ok: false, erro: mensagem, ...(erro instanceof LimiteDaApi ? { esperar: erro.esperar } : {}) };
   }
 }
 
@@ -211,11 +236,15 @@ let ultimaTentativa = 0;
  * do hash do banco: 2 a 3 segundos de football-data por visita, gravação
  * recusada, e a cota de 10 consultas por minuto de lá indo embora.
  */
-export async function sincronizarSeAtrasado(sincronizadoEm: string | null, emJogo: boolean): Promise<boolean> {
+export async function sincronizarSeAtrasado(
+  sincronizadoEm: string | null,
+  emJogo: boolean,
+  cliente?: SupabaseClient,
+): Promise<boolean> {
   if (!limparVariavel(process.env.FOOTBALL_DATA_TOKEN)) return false;
   if (sincronizadoEm && Date.now() - new Date(sincronizadoEm).getTime() < intervaloMinimo(emJogo)) return false;
   if (Date.now() - ultimaTentativa < INTERVALO_EM_JOGO_MS) return false;
   ultimaTentativa = Date.now();
-  const resultado = await sincronizarBolao();
+  const resultado = await sincronizarBolao(cliente);
   return resultado.ok;
 }

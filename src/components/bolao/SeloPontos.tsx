@@ -3,17 +3,21 @@ export default function SeloPontos({
   pontos,
   base,
   compacto = false,
+  provisorio = false,
 }: {
   pontos: number | null;
   /** Faixa sem a zebra. A cor segue a faixa: um +10 de zebra é um placar exato (+5) dobrado. */
   base?: number | null;
   compacto?: boolean;
+  /** Jogo rolando: o que faria se acabasse agora. Borda tracejada e sem o laranja cheio, para não passar por ponto que já vale. */
+  provisorio?: boolean;
 }) {
   if (pontos === null) return null;
 
   const faixa = base ?? pontos;
-  const estilo =
-    faixa === 5
+  const estilo = provisorio
+    ? `border-dashed ${faixa >= 2 ? 'border-primary/60 text-primary' : faixa === 1 ? 'border-zinc-500 text-zinc-300' : 'border-zinc-700 text-zinc-600'}`
+    : faixa === 5
       ? 'border-primary bg-primary text-ink'
       : faixa >= 2
         ? 'border-primary/50 text-primary'
@@ -24,6 +28,7 @@ export default function SeloPontos({
   return (
     // `compacto`: cabeçalho do ranking, onde quatro selos dividem a largura do card.
     <span
+      title={provisorio ? 'Se o jogo acabasse agora' : undefined}
       className={`t-micro numerico inline-flex justify-center rounded-full border py-0.5 ${
         compacto ? 'min-w-[1.875rem] px-1' : 'min-w-[2.25rem] px-2'
       } ${estilo}`}

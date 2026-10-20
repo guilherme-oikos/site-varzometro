@@ -101,12 +101,20 @@ export async function atualizarParaLogado(): Promise<{ sincronizou: boolean } | 
   if (!logado) return null;
   const { supabase } = logado;
 
-  const [{ data: estado }, emJogo] = await Promise.all([
+  const [{ data: estado }, emJogo, { data: perfil }] = await Promise.all([
     supabase.from('bolao_estado').select('sincronizado_em').maybeSingle<{ sincronizado_em: string | null }>(),
     temJogoEmAndamento(supabase),
+    supabase.from('perfis').select('is_admin').eq('id', logado.user.id).maybeSingle<{ is_admin: boolean }>(),
   ]);
 
-  const sincronizou = await sincronizarSeAtrasado(estado?.sincronizado_em ?? null, emJogo);
+  // Admin grava com a própria sessão (`bolao_sincronizar` aceita); o resto, com
+  // o CRON_SECRET. Sem isso, no dev — onde o CRON_SECRET costuma não existir —
+  // a busca falhava calada a cada visita e o placar não entrava nunca.
+  const sincronizou = await sincronizarSeAtrasado(
+    estado?.sincronizado_em ?? null,
+    emJogo,
+    perfil?.is_admin ? supabase : undefined,
+  );
   if (sincronizou) revalidateTag(TAG_BOLAO);
   return { sincronizou };
 }

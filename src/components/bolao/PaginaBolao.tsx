@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import AlternarRanking from '@/components/bolao/AlternarRanking';
+import AtualizarAoVivo from '@/components/bolao/AtualizarAoVivo';
 import CampeaoRodada from '@/components/bolao/CampeaoRodada';
-import { ArrowRightIcon } from '@/components/Icons';
+import { ArrowRightIcon, UsersIcon } from '@/components/Icons';
 import CardJogo from '@/components/bolao/CardJogo';
 import FiltroTimes from '@/components/bolao/FiltroTimes';
 import LembretePalpite from '@/components/bolao/LembretePalpite';
@@ -15,11 +17,14 @@ import {
   autoresDoRanking,
   desempenhoNoProprioTime,
   evolucao,
+  palpitesAoVivo,
   placarDaRodada,
   rodadaAtual,
+  somarNoRanking,
   timesDoBolao,
 } from '@/lib/bolao';
-import { getBolaoPublico, getHistoricoPublico, getRodadaPublica } from '@/lib/bolao-dados';
+import { getBolaoPublico, getHistoricoPublico, getPalpitesAoVivoPublico, getRodadaPublica } from '@/lib/bolao-dados';
+import { JANELA_DE_JOGO_MS } from '@/lib/bolao-sync';
 import { siglaDeClube } from '@/lib/site';
 
 /**
@@ -39,6 +44,21 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
   const agora = Date.now();
 
   const historico = bolao ? await getHistoricoPublico() : [];
+
+  // "Se acabasse agora": o ranking oficial mais o que os jogos rolando dariam.
+  const rolando = bolao?.jogos.filter((jogo) => jogo.status === 'ao_vivo') ?? [];
+  const rankingAoVivo =
+    bolao && rolando.length > 0 ? somarNoRanking(bolao.ranking, palpitesAoVivo(rolando, await getPalpitesAoVivoPublico())) : null;
+  // Horários para o navegador saber quando há jogo rolando: os que podem estar
+  // rolando agora e os da próxima semana (a página pode ter sido montada antes do apito).
+  const inicios =
+    bolao?.jogos
+      .filter((jogo) => jogo.status === 'agendado' || jogo.status === 'ao_vivo')
+      .map((jogo) => jogo.inicio)
+      .filter((inicio) => {
+        const comeco = new Date(inicio).getTime();
+        return comeco > agora - JANELA_DE_JOGO_MS && comeco < agora + 7 * 24 * 60 * 60 * 1000;
+      }) ?? [];
   const placar = placarDaRodada(jogos, dados?.palpites ?? [], autores);
   const grafico = bolao ? evolucao(bolao.jogos, historico, autores) : null;
   const clubeDe = new Map(bolao?.ranking.map((linha) => [linha.autor_id, siglaDeClube(linha.clube)]) ?? []);
@@ -87,6 +107,7 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
           </div>
         ) : (
           <>
+          <AtualizarAoVivo inicios={inicios} janela={JANELA_DE_JOGO_MS} />
           <LembretePalpite />
           <div className="mt-10">
             <FiltroTimes times={timesDoBolao(bolao.jogos)} />
@@ -124,14 +145,22 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
             <aside className="order-first lg:sticky lg:top-28 lg:order-none">
               <h2 className="t-title text-white">Ranking</h2>
               <div className="mt-4">
-                <TabelaRanking ranking={bolao.ranking} />
+                <AlternarRanking
+                  oficial={<TabelaRanking ranking={bolao.ranking} />}
+                  aoVivo={rankingAoVivo ? <TabelaRanking ranking={rankingAoVivo} oficial={bolao.ranking} /> : null}
+                  rolando={rolando.length}
+                />
               </div>
-              <Link
-                href="/bolao/duelo"
-                className="toque-linha mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-              >
-                Duelo: um contra um da bancada
-                <ArrowRightIcon className="h-4 w-4" />
+              {/* Card inteiro clicável, e não link de texto: embaixo da tabela, o link passava batido. */}
+              <Link href="/bolao/duelo" className="card card-hover group mt-4 flex items-center gap-3 p-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                  <UsersIcon className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold text-white">Duelo</span>
+                  <span className="block text-sm text-muted">Um contra um da bancada: quem leva no confronto direto</span>
+                </span>
+                <ArrowRightIcon className="h-5 w-5 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
               </Link>
               <RegrasBolao className="mt-6 hidden lg:block" />
             </aside>

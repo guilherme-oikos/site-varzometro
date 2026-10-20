@@ -6,7 +6,7 @@ import CardJogo from '@/components/bolao/CardJogo';
 import { EVENTO_PALPITES_SALVOS } from '@/components/bolao/LembretePalpite';
 import { SpinnerIcon } from '@/components/Icons';
 import CorrecaoJogo from '@/components/painel/CorrecaoJogo';
-import { toast, Toaster } from '@/components/ui/sonner';
+import { toast } from '@/components/ui/sonner';
 import { jogoAberto, quandoE, RESENHA_MAX, type AutorDoBolao, type Jogo, type Palpite } from '@/lib/bolao';
 
 type Rascunho = Record<number, { mandante: string; visitante: string; resenha: string; dobrado: boolean }>;
@@ -144,8 +144,7 @@ export default function FormPalpites({
 
   return (
     <>
-      {/* O resultado de salvar sai em toast (Sonner, como no shadcn). Fica aqui, e não no layout: só quem palpita baixa. */}
-      <Toaster />
+      {/* O resultado de salvar sai em toast (Sonner, como no shadcn). O <Toaster> fica em `PalpitesDoLogado`. */}
       <ul className="space-y-3">
         {jogos.map((jogo) => {
           const aberto = jogoAberto(jogo, agora);
