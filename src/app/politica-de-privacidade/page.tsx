@@ -80,6 +80,13 @@ export default function PoliticaDePrivacidadePage() {
             navega, lê, clica nos links e vai embora — sem deixar dados conosco.
           </p>
           <p>
+            O blog mostra quantas vezes cada artigo foi aberto. É um{' '}
+            <strong>número por artigo</strong>, que soma 1 a cada carregamento
+            da página, e mais nada: não guardamos endereço IP, não usamos cookie
+            e não sabemos quem leu. O total fica no Supabase, junto com os
+            artigos.
+          </p>
+          <p>
             A exceção é a <strong>área da bancada</strong>, usada só pelos
             integrantes e colaboradores do podcast para editar o próprio perfil e
             publicar artigos. As contas são criadas por nós, não há cadastro

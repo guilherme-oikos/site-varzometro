@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import PostCard from '@/components/PostCard';
+import { useVisualizacoes } from '@/components/Visualizacoes';
 import { clubes, type ClubeSigla } from '@/lib/site';
 import type { PostMeta } from '@/lib/posts';
 
@@ -11,6 +12,7 @@ const ordem: Filtro[] = ['TODOS', 'SPFC', 'SCCP', 'SEP', 'SFC'];
 
 export default function BlogList({ posts }: { posts: PostMeta[] }) {
   const [filtro, setFiltro] = useState<Filtro>('TODOS');
+  const visualizacoes = useVisualizacoes(useMemo(() => posts.map((post) => post.slug), [posts]));
 
   const visiveis = useMemo(
     () => (filtro === 'TODOS' ? posts : posts.filter((p) => p.clube === filtro)),
@@ -57,7 +59,7 @@ export default function BlogList({ posts }: { posts: PostMeta[] }) {
       {visiveis.length > 0 ? (
         <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {visiveis.map((post) => (
-            <PostCard key={post.slug} post={post} />
+            <PostCard key={post.slug} post={post} visualizacoes={visualizacoes[post.slug]} />
           ))}
         </div>
       ) : (

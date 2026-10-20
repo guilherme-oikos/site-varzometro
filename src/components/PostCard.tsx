@@ -1,10 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRightIcon, ClockIcon } from '@/components/Icons';
+import { SeloVisualizacoes } from '@/components/Visualizacoes';
 import { seloDoArtigo } from '@/lib/site';
 import type { PostMeta } from '@/lib/posts';
 
-export default function PostCard({ post }: { post: PostMeta }) {
+/** `visualizacoes`: só o /blog passa (o navegador busca depois); sem ele, o selo não aparece. */
+export default function PostCard({ post, visualizacoes }: { post: PostMeta; visualizacoes?: number }) {
   const selo = seloDoArtigo(post.clube);
 
   /*
@@ -74,9 +76,12 @@ export default function PostCard({ post }: { post: PostMeta }) {
             <span className={`tag-clube ${selo.classe}`}>{selo.sigla}</span>
           )}
 
-          <span className="t-micro numerico inline-flex items-center gap-1.5 text-muted">
-            <ClockIcon className="h-3.5 w-3.5" />
-            {post.readingTime}
+          <span className="t-micro flex items-center gap-3 text-muted">
+            <SeloVisualizacoes total={visualizacoes} />
+            <span className="numerico inline-flex items-center gap-1.5">
+              <ClockIcon className="h-3.5 w-3.5" />
+              {post.readingTime}
+            </span>
           </span>
         </div>
 

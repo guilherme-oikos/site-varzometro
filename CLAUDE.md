@@ -274,10 +274,18 @@ sufixo "- VARZÔMETRO #NN".
   laranja da logo; o cliente decidiu manter o `#E07C0A`.
 - **Estilo visual:** bordas finas com brilho sutil, sem sombras pesadas.
 
+**Contador de visualizações do blog** (`0006_visualizacoes.sql`): um número
+por artigo, sem IP nem cookie, somado a cada carregamento. O navegador chama
+`/api/visualizacoes` depois de a página aparecer (`src/components/Visualizacoes.tsx`)
+— o número não vai no HTML, senão as páginas do blog deixariam de ser
+estáticas ou o contador ficaria parado no cache. Tabela à parte de `artigos`
+para o dono não conseguir mexer no próprio contador pela RLS.
+
 ## Privacidade
 
 `/politica-de-privacidade` descreve o site como ele é hoje: sem formulário, sem
-analytics e sem cookies para visitantes — por isso não há banner de cookies. O
+analytics (o contador de visualizações é só um total por artigo, e a política
+já cita) e sem cookies para visitantes — por isso não há banner de cookies. O
 único cookie é o de sessão da área da bancada, estritamente necessário e só para
 quem faz login; a política já cita isso e o Supabase como operador.
 **Se for adicionar Google Analytics, Meta Pixel, newsletter, formulário ou player

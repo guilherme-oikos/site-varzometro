@@ -218,3 +218,19 @@ Users mantendo o mesmo domínio.
 
 A Vercel Hobby é para uso **não comercial**. Se o site passar a ter patrocínio
 ou anúncio, os termos pedem o plano Pro.
+
+## 8. Contador de visualizações do blog
+
+**SQL Editor → New query**: cole [`supabase/migrations/0006_visualizacoes.sql`](supabase/migrations/0006_visualizacoes.sql)
+inteiro e clique em **Run**. Pode ser antes ou depois do push: sem ela o site
+continua de pé, só o contador (o olho nos cards do `/blog` e no topo do artigo)
+não aparece, e o log da Vercel mostra `[visualizacoes] Supabase recusou`.
+
+É um número por artigo, somado a cada abertura da página (recarregar conta de
+novo). Ninguém escreve na tabela direto: só a função `registrar_visualizacao`,
+chamada por `/api/visualizacoes`. Para zerar um artigo:
+
+```sql
+delete from public.artigo_visualizacoes
+where artigo_id = (select id from public.artigos where slug = 'SLUG-DO-ARTIGO');
+```

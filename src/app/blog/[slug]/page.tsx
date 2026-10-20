@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import PostCard from '@/components/PostCard';
 import CorpoDoArtigo from '@/components/CorpoDoArtigo';
 import { ArrowLeftIcon, ClockIcon } from '@/components/Icons';
+import { ContadorDoArtigo } from '@/components/Visualizacoes';
 import {
   dataIso,
   getAllPosts,
@@ -201,6 +202,7 @@ export default async function PostPage({ params }: Params) {
                 <ClockIcon className="h-3.5 w-3.5" />
                 {post.readingTime}
               </span>
+              <ContadorDoArtigo slug={post.slug} />
             </span>
           </div>
         </header>
