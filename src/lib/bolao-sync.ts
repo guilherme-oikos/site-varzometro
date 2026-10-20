@@ -8,7 +8,9 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
  * Traz os jogos do Brasileirão do football-data.org e grava no banco.
  *
  * O plano grátis cobre a Série A ("BSA") e aceita 10 consultas por minuto. A
- * sincronização faz uma só: a temporada atual inteira. Quem decide o que entra
+ * sincronização faz uma só: a temporada atual inteira. Quando o football-data
+ * vira o campeonato (2026 → 2027), os jogos novos chegam com o ano novo em
+ * `temporada` e o site passa a mostrar a temporada mais recente sozinho. Quem decide o que entra
  * (só jogo que ainda não começou) e o que não se sobrescreve (correção do
  * admin) é a função `bolao_sincronizar` no banco.
  *
@@ -63,10 +65,14 @@ type JogoDaApi = {
   homeTeam: TimeDaApi;
   awayTeam: TimeDaApi;
   score?: { fullTime?: { home: number | null; away: number | null } };
+  /** `startDate` "2026-01-28": o ano é a temporada. */
+  season?: { startDate?: string | null };
 };
 
 export type JogoParaGravar = {
   id: number;
+  /** Sem `season` no jogo, o banco usa o ano da data do jogo (ver `bolao_sincronizar`). */
+  temporada: number | null;
   rodada: number;
   mandante: string;
   mandante_sigla: string;
@@ -108,8 +114,11 @@ function traduzir(jogo: JogoDaApi): JogoParaGravar | null {
   // Sem rodada ou com status desconhecido não dá para encaixar na tela.
   if (!status || !jogo.matchday) return null;
 
+  const ano = Number(jogo.season?.startDate?.slice(0, 4));
+
   return {
     id: jogo.id,
+    temporada: Number.isInteger(ano) && ano > 2000 ? ano : null,
     rodada: jogo.matchday,
     mandante: nomeDoTime(jogo.homeTeam),
     mandante_sigla: (jogo.homeTeam.tla ?? '').trim(),

@@ -14,6 +14,8 @@ export type StatusJogo = 'agendado' | 'ao_vivo' | 'encerrado' | 'adiado' | 'canc
 
 export type Jogo = {
   id: number;
+  /** Ano do campeonato. A rodada se repete entre temporadas; o par (temporada, rodada) não. */
+  temporada: number;
   rodada: number;
   mandante: string;
   mandante_sigla: string;
@@ -65,6 +67,8 @@ export type LinhaRanking = {
   vencedor_e_gols: number;
   so_vencedor: number;
   so_gols: number;
+  /** A view tem uma linha por pessoa e temporada: cada campeonato começa do zero. */
+  temporada: number;
 };
 
 /** Quantas vezes a linha do ranking fez cada faixa de `REGRAS`. */
@@ -74,7 +78,7 @@ export function vezesPorFaixa(linha: LinhaRanking): Record<(typeof REGRAS)[numbe
 
 /** Colunas de `bolao_jogos` que as telas usam. */
 export const COLUNAS_JOGO =
-  'id, rodada, mandante, mandante_sigla, mandante_escudo, visitante, visitante_sigla, ' +
+  'id, temporada, rodada, mandante, mandante_sigla, mandante_escudo, visitante, visitante_sigla, ' +
   'visitante_escudo, inicio, status, gols_mandante, gols_visitante, revelado, editado_a_mao';
 
 export const REGRAS = [

@@ -39,6 +39,17 @@ export function usuarioDoEmail(email: string | undefined): string | undefined {
  * públicas usam isto para saber, sem ir ao servidor, se vale carregar a parte
  * de quem está logado.
  */
+const COOKIE_SESSAO = '(?:^|;\\s*)sb-[^=]+-auth-token(?:\\.\\d+)?=';
+
 export function temCookieDeSessao(): boolean {
-  return /(?:^|;\s*)sb-[^=]+-auth-token(?:\.\d+)?=/.test(document.cookie);
+  return new RegExp(COOKIE_SESSAO).test(document.cookie);
 }
+
+/**
+ * Roda no `<head>`, antes de a página aparecer: marca `<html data-sessao>`
+ * quando há cookie de sessão. É o que deixa o CSS esconder, já no primeiro
+ * quadro, o que é só de visitante (ver `PalpitesDoLogado`) — sem isso quem
+ * está logado via os cards de visitante e depois uma piscada. Só lê o cookie,
+ * não grava nada: visitante continua sem cookie nenhum.
+ */
+export const SCRIPT_SESSAO = `try{if(new RegExp(${JSON.stringify(COOKIE_SESSAO)}).test(document.cookie))document.documentElement.dataset.sessao='1'}catch(e){}`;

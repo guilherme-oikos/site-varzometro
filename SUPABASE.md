@@ -109,6 +109,11 @@ nenhum link já compartilhado quebrar.
    Por último, [`supabase/migrations/0004_resenha_e_zebra.sql`](supabase/migrations/0004_resenha_e_zebra.sql)
    (resenha no palpite e zebra da rodada). Sem ela o site continua de pé, mas
    salvar palpite dá "Falta rodar a migração 0004".
+   E [`supabase/migrations/0005_temporadas.sql`](supabase/migrations/0005_temporadas.sql)
+   (uma temporada por campeonato). **Esta é obrigatória antes do push:** o
+   código novo lê a coluna `temporada`, e sem ela o bolão inteiro dá erro.
+   Depois do deploy, dá para apagar a versão antiga de uma função:
+   `drop function public.bolao_quem_palpitou(integer);`
 2. Ainda no SQL Editor, grave o segredo da sincronização — **o mesmo valor do
    `CRON_SECRET`** da Vercel:
 
@@ -125,6 +130,11 @@ nenhum link já compartilhado quebrar.
    fora.
 
 Como funciona no dia a dia:
+
+- **Virada de campeonato (2026 → 2027) não pede nada.** Quando o football-data
+  passa a devolver a temporada nova, a sincronização grava os jogos com o ano
+  novo, o `/bolao` mostra a temporada mais recente com o ranking zerado, e a
+  anterior fica em `/bolao/temporada/<ano>` com o pódio e a classificação final.
 
 - **Os jogos se atualizam sozinhos.** Um cron às 2h busca data, situação e
   placar. Fora isso, alguém logado abrir o `/bolao` busca de novo se a última busca

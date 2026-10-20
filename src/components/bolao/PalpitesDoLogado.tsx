@@ -3,12 +3,17 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import EsqueletoJogos from '@/components/bolao/EsqueletoJogos';
 import type { AutorDoBolao } from '@/lib/bolao';
 import type { MeuBolao } from '@/lib/bolao-logado';
 import { temCookieDeSessao } from '@/lib/usuario';
 
 // Só quem está logado baixa o formulário: o visitante fica com os cards de `children`.
-const FormPalpites = dynamic(() => import('@/components/painel/FormPalpites'));
+const carregarFormulario = () => import('@/components/painel/FormPalpites');
+// Enquanto o código do formulário baixa, o mesmo esqueleto de logado — sem buraco na tela.
+const FormPalpites = dynamic(carregarFormulario, {
+  loading: () => <EsqueletoJogos variante="logado" quantidade={3} />,
+});
 const BotaoAtualizarJogos = dynamic(() => import('@/components/painel/BotaoAtualizarJogos'));
 
 const dataHora = new Intl.DateTimeFormat('pt-BR', {
@@ -26,7 +31,12 @@ const dataHora = new Intl.DateTimeFormat('pt-BR', {
  * Com o cookie de sessão, pede os dados da pessoa a `/api/bolao/meu` e troca
  * os cards pelo formulário de palpite. Assim a página segue estática e sem
  * ler cookie no servidor, e não existe uma segunda página só para palpitar.
- * Enquanto a resposta não vem, os cards públicos ficam na tela.
+ *
+ * Enquanto a resposta não vem, quem tem o cookie vê o esqueleto, e não os
+ * cards de visitante: as duas versões têm visual diferente, e mostrar uma e
+ * trocar pela outra dava uma piscada. A escolha é por CSS (`so-visitante` /
+ * `so-logado`, ver globals.css), porque o HTML do servidor aparece antes de o
+ * React rodar — só o script do <head> chega a tempo.
  *
  * Se a última busca de placar já passou do intervalo, chama
  * `/api/bolao/atualizar` depois, sem ninguém esperar por ela; trouxe placar
@@ -39,6 +49,7 @@ export default function PalpitesDoLogado({
   time,
   autores,
   mostrarRodada = false,
+  quantidade,
   children,
 }: {
   /** Uma rodada (/bolao) ou um time (/bolao/time/<slug>). */
@@ -47,15 +58,24 @@ export default function PalpitesDoLogado({
   autores: AutorDoBolao[];
   /** Na lista de um time os jogos são de várias rodadas: cada card diz a sua. */
   mostrarRodada?: boolean;
+  /** Quantos cards o esqueleto desenha enquanto carrega. */
+  quantidade: number;
   children: React.ReactNode;
 }) {
   const filtro = time ? `time=${encodeURIComponent(time)}` : `rodada=${rodada ?? 0}`;
   const router = useRouter();
   const [meu, setMeu] = useState<MeuBolao | null>(null);
-  const [carregando, setCarregando] = useState(false);
+  // 'esperando' até saber: com cookie, vira 'logado' (formulário) ou, se a
+  // sessão venceu, 'publico'; sem cookie, 'publico' na hora.
+  const [estado, setEstado] = useState<'esperando' | 'logado' | 'publico'>('esperando');
 
   useEffect(() => {
-    if (!temCookieDeSessao()) return;
+    if (!temCookieDeSessao()) {
+      // Saiu do login sem recarregar: a marca do <head> ficou para trás.
+      delete document.documentElement.dataset.sessao;
+      setEstado('publico');
+      return;
+    }
     // Trocou de rodada no meio (ou o modo estrito do dev montou duas vezes): cancela a anterior.
     const controle = new AbortController();
     const ler = async () => {
@@ -63,11 +83,12 @@ export default function PalpitesDoLogado({
       return resposta.ok ? ((await resposta.json()) as MeuBolao) : null;
     };
 
-    setCarregando(true);
+    // O código do formulário baixa junto com os dados, não depois deles.
+    carregarFormulario().catch(() => {});
     ler()
       .then(async (dados) => {
         setMeu(dados);
-        setCarregando(false);
+        setEstado(dados ? 'logado' : 'publico');
         if (!dados?.atrasado) return;
         const resposta = await fetch('/api/bolao/atualizar', { method: 'POST', signal: controle.signal });
         const resultado = resposta.ok ? ((await resposta.json()) as { sincronizou: boolean } | null) : null;
@@ -78,21 +99,21 @@ export default function PalpitesDoLogado({
       })
       // Sem rede, sessão vencida ou cancelado: fica a versão pública, que já está na tela.
       .catch(() => {
-        if (!controle.signal.aborted) setCarregando(false);
+        if (!controle.signal.aborted) setEstado('publico');
       });
 
     return () => controle.abort();
   }, [filtro, router]);
 
-  if (!meu) {
+  if (estado === 'publico' || (estado === 'logado' && !meu)) return <>{children}</>;
+
+  if (estado === 'esperando' || !meu) {
     return (
       <>
-        {carregando ? (
-          <p role="status" className="mb-3 text-xs text-muted motion-safe:animate-pulse">
-            Carregando seus palpites...
-          </p>
-        ) : null}
-        {children}
+        <div className="so-visitante">{children}</div>
+        <div className="so-logado">
+          <EsqueletoJogos quantidade={quantidade} variante="logado" />
+        </div>
       </>
     );
   }

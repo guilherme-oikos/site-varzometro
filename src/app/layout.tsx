@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FloatingCTA from '@/components/FloatingCTA';
 import { site } from '@/lib/site';
+import { SCRIPT_SESSAO } from '@/lib/usuario';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -77,7 +78,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={jakarta.variable}>
+    // `suppressHydrationWarning`: o script abaixo põe `data-sessao` no <html> antes do React.
+    <html lang="pt-BR" className={jakarta.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_SESSAO }} />
+      </head>
       <body className="min-h-screen bg-ink font-sans">
         <a
           href="#conteudo"

@@ -17,6 +17,11 @@ import { supabasePublico } from '@/lib/supabase/publico';
  */
 
 export type Bolao = {
+  /** A temporada lida — a mais recente, se ninguém pediu outra. */
+  temporada: number;
+  /** Todas as temporadas com jogo, da mais nova para a mais velha. */
+  temporadas: number[];
+  /** Jogos e ranking são só de `temporada`: cada campeonato começa do zero. */
   jogos: Jogo[];
   ranking: LinhaRanking[];
   sincronizadoEm: string | null;
@@ -54,26 +59,52 @@ function falhou(onde: string, mensagem: string): never {
   throw new Error(`[bolao] falha ao ler ${onde}: ${mensagem}`);
 }
 
-export async function lerBolao(cliente: SupabaseClient): Promise<Bolao> {
-  const [jogos, ranking, estado] = await Promise.all([
-    cliente.from('bolao_jogos').select(COLUNAS_JOGO).order('inicio').order('id').returns<Jogo[]>(),
+/**
+ * Jogos e ranking de uma temporada. Sem `temporada`, a mais recente: é o que
+ * faz a virada de campeonato não pedir mudança nenhuma — chegou jogo de 2027,
+ * o site passa a mostrar 2027.
+ *
+ * A lista de temporadas sai da view do ranking (uma linha por pessoa e
+ * temporada, poucas linhas), e não de `bolao_jogos`, que passa das 1.000
+ * linhas que o PostgREST devolve de uma vez já na terceira temporada.
+ */
+export async function lerBolao(cliente: SupabaseClient, pedida?: number): Promise<Bolao> {
+  const [anos, estado] = await Promise.all([
+    cliente.from('bolao_ranking').select('temporada').returns<{ temporada: number }[]>(),
+    cliente.from('bolao_estado').select('sincronizado_em').maybeSingle<{ sincronizado_em: string | null }>(),
+  ]);
+  if (anos.error) falhou('as temporadas', anos.error.message);
+  if (estado.error) falhou('o estado', estado.error.message);
+
+  const temporadas = Array.from(new Set(anos.data.map((linha) => linha.temporada))).sort((x, y) => y - x);
+  // Bolão vazio (antes da primeira busca): o ano corrente, sem jogo nenhum.
+  const temporada = pedida ?? temporadas[0] ?? new Date().getFullYear();
+
+  const [jogos, ranking] = await Promise.all([
+    cliente
+      .from('bolao_jogos')
+      .select(COLUNAS_JOGO)
+      .eq('temporada', temporada)
+      .order('inicio')
+      .order('id')
+      .returns<Jogo[]>(),
     cliente
       .from('bolao_ranking')
       .select('*')
+      .eq('temporada', temporada)
       .order('pontos', { ascending: false })
       .order('exatos', { ascending: false })
       .order('resultados', { ascending: false })
       .order('ordem')
       .order('nome')
       .returns<LinhaRanking[]>(),
-    cliente.from('bolao_estado').select('sincronizado_em').maybeSingle<{ sincronizado_em: string | null }>(),
   ]);
-
   if (jogos.error) falhou('os jogos', jogos.error.message);
   if (ranking.error) falhou('o ranking', ranking.error.message);
-  if (estado.error) falhou('o estado', estado.error.message);
 
   return simularBolao({
+    temporada,
+    temporadas,
     jogos: jogos.data,
     ranking: ranking.data,
     sincronizadoEm: estado.data?.sincronizado_em ?? null,
@@ -104,7 +135,9 @@ export async function lerJogos(cliente: SupabaseClient, bolao: Bolao, ids: numbe
       .returns<LinhaDePalpite[]>(),
     // `get: true` para a chamada sair como GET e entrar no cache do Next como
     // as outras consultas.
-    ...rodadas.map((rodada) => cliente.rpc('bolao_quem_palpitou', { rodada_alvo: rodada }, { get: true })),
+    ...rodadas.map((rodada) =>
+      cliente.rpc('bolao_quem_palpitou', { rodada_alvo: rodada, temporada_alvo: bolao.temporada }, { get: true }),
+    ),
   ]);
 
   if (palpites.error) falhou('os palpites', palpites.error.message);
@@ -131,6 +164,7 @@ export async function lerPalpitesEncerrados(cliente: SupabaseClient, bolao: Bola
     const { data, error } = await cliente
       .from('bolao_palpites_pontuados')
       .select('*')
+      .eq('temporada', bolao.temporada)
       .not('pontos', 'is', null)
       .order('jogo_id')
       .order('autor_id')
@@ -146,9 +180,10 @@ export async function lerPalpitesEncerrados(cliente: SupabaseClient, bolao: Bola
 /* --------------------------------------------------------- Site público -- */
 
 /** Sem Supabase (dev sem conta), o bolão simplesmente não existe. */
-export const getBolaoPublico = cache(async (): Promise<Bolao | null> => {
+/** Sem `temporada`, a mais recente. Com, para a página de arquivo (/bolao/temporada/<ano>). */
+export const getBolaoPublico = cache(async (temporada?: number): Promise<Bolao | null> => {
   if (!supabaseConfigurado) return null;
-  return lerBolao(supabasePublico('bolao'));
+  return lerBolao(supabasePublico('bolao'), temporada);
 });
 
 export const getRodadaPublica = cache(async (rodada: number): Promise<Rodada> => {
@@ -157,8 +192,8 @@ export const getRodadaPublica = cache(async (rodada: number): Promise<Rodada> =>
   return lerRodada(supabasePublico('bolao'), bolao, rodada);
 });
 
-export const getHistoricoPublico = cache(async (): Promise<Palpite[]> => {
-  const bolao = await getBolaoPublico();
+export const getHistoricoPublico = cache(async (temporada?: number): Promise<Palpite[]> => {
+  const bolao = await getBolaoPublico(temporada);
   if (!bolao) return [];
   return lerPalpitesEncerrados(supabasePublico('bolao'), bolao);
 });

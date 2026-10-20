@@ -55,17 +55,31 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-fade-primary" />
 
       <div className="container-page relative">
-        <h1 className="t-page mt-4 max-w-3xl text-balance text-white">
+        {bolao ? <p className="t-label mt-4 text-primary">Brasileirão {bolao.temporada}</p> : null}
+        <h1 className={`t-page max-w-3xl text-balance text-white ${bolao ? 'mt-2' : 'mt-4'}`}>
           Bolão da <span className="text-primary">bancada</span>
         </h1>
         <p className="t-lead medida-apoio mt-5 text-muted">
           A bancada crava o placar de cada jogo do Brasileirão. Aqui dá para ver quem está mandando bem
           e quem só fala bonito no microfone.
         </p>
+        {/* Campeonatos que já viraram: cada um tem o seu arquivo, com o ranking final. */}
+        {bolao && bolao.temporadas.length > 1 ? (
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+            Temporadas anteriores:
+            {bolao.temporadas
+              .filter((ano) => ano !== bolao.temporada)
+              .map((ano) => (
+                <Link key={ano} href={`/bolao/temporada/${ano}`} className="toque-linha font-semibold text-primary hover:underline">
+                  {ano}
+                </Link>
+              ))}
+          </p>
+        ) : null}
 
         {!bolao || rodadas.length === 0 ? (
           <div className="mt-12">
-            <PalpitesDoLogado rodada={0} autores={autores}>
+            <PalpitesDoLogado rodada={0} autores={autores} quantidade={1}>
               <p className="card p-6 text-sm text-muted">
                 O bolão ainda não começou. Os jogos aparecem aqui assim que a próxima rodada for carregada.
               </p>
@@ -86,7 +100,7 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
                 quantidade={jogos.length}
               >
                 <CampeaoRodada placar={placar} />
-                <PalpitesDoLogado key={escolhida} rodada={escolhida!} autores={autores}>
+                <PalpitesDoLogado key={escolhida} rodada={escolhida!} autores={autores} quantidade={jogos.length}>
                   <ul className="space-y-3">
                     {jogos.map((jogo) => (
                       <li key={jogo.id}>

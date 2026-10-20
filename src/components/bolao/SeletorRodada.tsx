@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
-import EsqueletoJogos from '@/components/bolao/EsqueletoJogos';
+import { EsqueletoDosDois } from '@/components/bolao/EsqueletoJogos';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/Icons';
 
 /**
@@ -73,7 +73,8 @@ export default function SeletorRodada({
       </nav>
 
       <div className="mt-5" aria-busy={carregando}>
-        {carregando ? <EsqueletoJogos quantidade={quantidade} /> : children}
+        {/* Logado e visitante têm cards diferentes: cada um vê o esqueleto do seu. */}
+        {carregando ? <EsqueletoDosDois quantidade={quantidade} /> : children}
       </div>
     </>
   );

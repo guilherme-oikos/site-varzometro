@@ -638,3 +638,15 @@
     transform: none;
   }
 }
+
+/*
+ * Só de visitante / só de quem está logado, já no primeiro quadro. O
+ * `data-sessao` vem do script do <head> (`SCRIPT_SESSAO`, em lib/usuario.ts),
+ * que roda antes de a página aparecer. Quem usa: `PalpitesDoLogado`, que
+ * enquanto carrega o formulário mostra o esqueleto em vez dos cards de
+ * visitante — senão o logado via os dois visuais, com uma piscada no meio.
+ */
+html[data-sessao] .so-visitante,
+html:not([data-sessao]) .so-logado {
+  display: none;
+}

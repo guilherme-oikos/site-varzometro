@@ -57,7 +57,11 @@ O conteúdo vem de cinco fontes:
    páginas públicas do canal (sem chave) → listas manuais do `site.ts`.
    Vídeos de até 3 minutos viram cortes; acima disso, episódios.
 
-5. **Bolão: `bolao_jogos` e `bolao_palpites`** (`supabase/migrations/0002_bolao.sql`;
+5. **Bolão: `bolao_jogos` e `bolao_palpites`** — uma temporada por campeonato
+   (`0005_temporadas.sql`): o site mostra a mais recente, a rodada se repete
+   entre temporadas, então tudo que é "por rodada" (zebra, quem palpitou,
+   página de rodada) é por temporada **e** rodada, e o ranking é por temporada.
+   `lerBolao` lê uma temporada só; arquivo em `/bolao/temporada/<ano>`. (`supabase/migrations/0002_bolao.sql`;
    a `0003_ranking_por_faixa.sql` refaz a view `bolao_ranking` com a contagem de
    +3, +2 e +1).
    Os jogos vêm do football-data.org (`src/lib/bolao-sync.ts`, competição
@@ -93,7 +97,11 @@ promete que visitante não recebe cookie. `supabaseServidor()` usa
 Quando a página pública precisa de algo de quem está logado (o palpite no
 `/bolao`, o `MenuPerfil`), o navegador confere o cookie com
 `temCookieDeSessao()` e só então chama uma rota (`/api/bolao/meu`) ou o
-cliente do navegador. **Para carregar dado ao abrir a página, rota com
+cliente do navegador. **Visual diferente para logado não pode piscar:** o HTML do servidor aparece
+antes do React, então quem decide no primeiro quadro é o CSS — o script
+`SCRIPT_SESSAO` no `<head>` do layout marca `<html data-sessao>` e as classes
+`so-visitante`/`so-logado` (globals.css) escondem uma versão ou a outra. O
+logado vê o esqueleto até o formulário chegar. **Para carregar dado ao abrir a página, rota com
 `fetch`, não Server Action:** o Next enfileira as actions e segura a tela
 enquanto uma está pendente — com a busca do football-data no meio, o gráfico
 do bolão ficava 6 a 8 segundos no esqueleto. O HTML continua o mesmo para todo mundo, e visitante não dispara

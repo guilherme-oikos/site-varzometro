@@ -57,7 +57,7 @@ export default async function PaginaTime({ slug }: { slug: string }) {
               {encerrados === 1 ? 'encerrado' : 'encerrados'}
             </p>
             <div className="mt-4">
-              <PalpitesDoLogado time={time.slug} autores={autores} mostrarRodada>
+              <PalpitesDoLogado time={time.slug} autores={autores} mostrarRodada quantidade={jogos.length}>
                 <ul className="space-y-3">
                   {jogos.map((jogo) => (
                     <li key={jogo.id}>
