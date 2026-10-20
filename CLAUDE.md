@@ -71,10 +71,12 @@ O conteúdo vem de cinco fontes:
    `src/lib/bolao-logado.ts`) se a última busca passou de 1 minuto com jogo em
    andamento, ou 10 sem jogo (o cron da Vercel grátis é só diário; 1 minuto é
    o piso do football-data grátis, 10 consultas/minuto). `/bolao` (e `/bolao/rodada/N` e `/bolao/time/<slug>`, os jogos de um
-   time só — endereço próprio e não `?time=`, que deixaria a página dinâmica)
+   time só — endereço próprio e não `?time=`, que deixaria a página dinâmica; e
+   `/bolao/palpiteiro/<slug>`, a página de cada um, com a conta em `palpiteiro()`)
    é pública e estática, com revalidação de 5
    minutos e tag `bolao` — o apito inicial muda o que a página mostra sem
-   ninguém salvar nada.
+   ninguém salvar nada. A home mostra líder e próximo jogo (`BolaoNaHome`) com
+   o mesmo cache: a sincronização refaz a home junto.
 
 Componentes são server components por padrão. No site público, os
 `'use client'` são `Header` (menu), `CarrosselMidia` (abas/carrossel),

@@ -4,6 +4,7 @@ import AlternarRanking from '@/components/bolao/AlternarRanking';
 import AtualizarAoVivo from '@/components/bolao/AtualizarAoVivo';
 import CampeaoRodada from '@/components/bolao/CampeaoRodada';
 import { ArrowRightIcon, UsersIcon } from '@/components/Icons';
+import AvatarAutor from '@/components/painel/AvatarAutor';
 import CardJogo from '@/components/bolao/CardJogo';
 import FiltroTimes from '@/components/bolao/FiltroTimes';
 import LembretePalpite from '@/components/bolao/LembretePalpite';
@@ -18,6 +19,7 @@ import {
   desempenhoNoProprioTime,
   evolucao,
   palpitesAoVivo,
+  paraSlug,
   placarDaRodada,
   rodadaAtual,
   somarNoRanking,
@@ -151,6 +153,23 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
                   rolando={rolando.length}
                 />
               </div>
+              {/* O nome no ranking também leva para lá, mas só se descobre passando o mouse. */}
+              <nav aria-label="Palpites de cada um" className="card mt-4 p-4">
+                <p className="font-bold text-white">Palpites de cada um</p>
+                <p className="text-sm text-muted">Histórico, melhor rodada e a freguesia de cada um</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {autores.map((autor) => (
+                    <Link
+                      key={autor.id}
+                      href={`/bolao/palpiteiro/${paraSlug(autor.nome)}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-ink-line py-1 pl-1 pr-3 text-sm font-semibold text-muted transition-colors hover:border-primary/60 hover:text-white"
+                    >
+                      <AvatarAutor autor={autor} tamanho="h-6 w-6" />
+                      {autor.nome}
+                    </Link>
+                  ))}
+                </div>
+              </nav>
               {/* Card inteiro clicável, e não link de texto: embaixo da tabela, o link passava batido. */}
               <Link href="/bolao/duelo" className="card card-hover group mt-4 flex items-center gap-3 p-4">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">

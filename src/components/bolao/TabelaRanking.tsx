@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import AvatarAutor from '@/components/painel/AvatarAutor';
 import SeloPontos from '@/components/bolao/SeloPontos';
-import { posicoes, REGRAS, vezesPorFaixa, type LinhaRanking } from '@/lib/bolao';
+import { paraSlug, posicoes, REGRAS, vezesPorFaixa, type LinhaRanking } from '@/lib/bolao';
 import { seloDoArtigo, siglaDeClube } from '@/lib/site';
 
 /**
@@ -81,7 +82,9 @@ export default function TabelaRanking({
                     {/* Clube embaixo do nome: ao lado, disputaria espaço com as quatro colunas. */}
                     <div className="min-w-0">
                       <p className={`truncate font-bold leading-tight ${meu ? 'text-primary' : 'text-white'}`}>
-                        {linha.nome}
+                        <Link href={`/bolao/palpiteiro/${paraSlug(linha.nome)}`} className="underline decoration-zinc-600 underline-offset-4 hover:decoration-primary">
+                          {linha.nome}
+                        </Link>
                         {meu ? <span className="font-semibold text-muted"> (você)</span> : null}
                       </p>
                       <span className={`tag-clube ${selo.classe} mt-1 !px-1.5 !py-0 text-[0.5625rem]`}>{selo.sigla}</span>

@@ -516,3 +516,143 @@ export function duelo(jogos: Jogo[], palpites: Palpite[], a: AutorDoBolao, b: Au
 
   return resultado;
 }
+
+/* ------------------------------------------------------ A bancada acha -- */
+
+export type BancadaAcha = {
+  /** Quantos palpitaram no jogo. */
+  total: number;
+  /** Palpites por resultado, na ordem mandante, empate, visitante. */
+  mandante: number;
+  empate: number;
+  visitante: number;
+  /** O placar que mais se repetiu, se algum se repetiu e sem empate na contagem. */
+  placarMaisApostado: { placar: string; vezes: number } | null;
+};
+
+/**
+ * O resumo do jogo depois do apito: para onde a bancada foi e qual placar
+ * mais saiu. Só com dois palpites ou mais — um palpite sozinho não é "a
+ * bancada". Antes do apito a RLS nem devolve os palpites dos outros.
+ */
+export function bancadaAcha(palpites: Palpite[]): BancadaAcha | null {
+  if (palpites.length < 2) return null;
+  const resumo: BancadaAcha = { total: palpites.length, mandante: 0, empate: 0, visitante: 0, placarMaisApostado: null };
+  const placares = new Map<string, number>();
+  for (const p of palpites) {
+    if (p.gols_mandante > p.gols_visitante) resumo.mandante++;
+    else if (p.gols_mandante < p.gols_visitante) resumo.visitante++;
+    else resumo.empate++;
+    const chave = `${p.gols_mandante} x ${p.gols_visitante}`;
+    placares.set(chave, (placares.get(chave) ?? 0) + 1);
+  }
+  const ordenados = Array.from(placares).sort((a, b) => b[1] - a[1]);
+  const [primeiro, segundo] = ordenados;
+  if (primeiro[1] >= 2 && (!segundo || segundo[1] < primeiro[1])) {
+    resumo.placarMaisApostado = { placar: primeiro[0], vezes: primeiro[1] };
+  }
+  return resumo;
+}
+
+/* ----------------------------------------------------------- Palpiteiro -- */
+
+export type RodadaDoPalpiteiro = {
+  rodada: number;
+  pontos: number;
+  exatos: number;
+  /** Todos os jogos da rodada (fora adiado e cancelado) já terminaram. */
+  completa: boolean;
+};
+
+export type TimeDoPalpiteiro = { time: string; jogos: number; acertos: number; erros: number };
+
+export type Palpiteiro = {
+  /** Jogos encerrados com palpite dele, do mais recente ao mais antigo. */
+  historico: { jogo: Jogo; palpite: Palpite }[];
+  rodadas: RodadaDoPalpiteiro[];
+  /** Melhor e pior rodada fechada. A pior só com duas rodadas fechadas ou mais. */
+  melhor: RodadaDoPalpiteiro | null;
+  pior: RodadaDoPalpiteiro | null;
+  /** O time em que mais erra o resultado (e erra mais do que acerta). Só conta time com dois jogos ou mais. */
+  freguesia: TimeDoPalpiteiro | null;
+  /** O time em que mais acerta o resultado (e acerta mais do que erra). Nunca é o mesmo da freguesia. */
+  manja: TimeDoPalpiteiro | null;
+};
+
+/**
+ * A página de cada um da bancada. Os pontos vêm do banco
+ * (`bolao_palpites_pontuados`), como no resto do histórico; aqui só se agrupa.
+ * Acerto e erro são pelo resultado (vencedor ou empate), como em "próprio time".
+ */
+export function palpiteiro(jogos: Jogo[], palpites: Palpite[], autorId: string): Palpiteiro {
+  const encerrados = new Map(jogos.filter((j) => j.status === 'encerrado').map((j) => [j.id, j]));
+  const meus = palpites.filter((p) => p.autor_id === autorId && p.pontos !== null && encerrados.has(p.jogo_id));
+
+  const historico = meus
+    .map((palpite) => ({ jogo: encerrados.get(palpite.jogo_id)!, palpite }))
+    .sort((a, b) => new Date(b.jogo.inicio).getTime() - new Date(a.jogo.inicio).getTime());
+
+  // Rodada sem palpite nenhum também conta, com zero: esquecer faz parte do bolão.
+  const rodadas = Array.from(new Set(Array.from(encerrados.values()).map((j) => j.rodada)))
+    .sort((a, b) => a - b)
+    .map((rodada) => {
+      const daRodada = meus.filter((p) => encerrados.get(p.jogo_id)!.rodada === rodada);
+      const pendentes = jogos.filter(
+        (j) => j.rodada === rodada && (j.status === 'agendado' || j.status === 'ao_vivo'),
+      ).length;
+      return {
+        rodada,
+        pontos: daRodada.reduce((soma, p) => soma + (p.pontos ?? 0), 0),
+        exatos: daRodada.filter((p) => p.pontos_base === 5).length,
+        completa: pendentes === 0,
+      };
+    });
+
+  const fechadas = rodadas.filter((r) => r.completa);
+  // Empate de pontos: vale a mais recente, que é a que a bancada lembra.
+  const melhor = fechadas.reduce<RodadaDoPalpiteiro | null>(
+    (atual, r) => (!atual || r.pontos > atual.pontos || (r.pontos === atual.pontos && r.exatos >= atual.exatos) ? r : atual),
+    null,
+  );
+  const pior =
+    fechadas.length >= 2
+      ? fechadas.reduce<RodadaDoPalpiteiro | null>((atual, r) => (!atual || r.pontos <= atual.pontos ? r : atual), null)
+      : null;
+
+  const porTime = new Map<string, TimeDoPalpiteiro>();
+  for (const { jogo, palpite } of historico) {
+    const acertou = (palpite.pontos_base ?? 0) >= 2;
+    for (const time of [jogo.mandante, jogo.visitante]) {
+      const linha = porTime.get(time) ?? { time, jogos: 0, acertos: 0, erros: 0 };
+      linha.jogos++;
+      if (acertou) linha.acertos++;
+      else linha.erros++;
+      porTime.set(time, linha);
+    }
+  }
+  const comBase = Array.from(porTime.values()).filter((t) => t.jogos >= 2);
+  const freguesia =
+    comBase
+      .filter((t) => t.erros > t.acertos)
+      .sort((a, b) => b.erros - a.erros || b.erros / b.jogos - a.erros / a.jogos || a.time.localeCompare(b.time, 'pt-BR'))[0] ??
+    null;
+  const manja =
+    comBase
+      .filter((t) => t.acertos > t.erros)
+      .sort(
+        (a, b) => b.acertos - a.acertos || b.acertos / b.jogos - a.acertos / a.jogos || a.time.localeCompare(b.time, 'pt-BR'),
+      )[0] ?? null;
+
+  return { historico, rodadas, melhor, pior, freguesia, manja };
+}
+
+/** O próximo jogo do bolão: o que está rolando, ou o primeiro marcado daqui para a frente. */
+export function proximoJogo(jogos: Jogo[], agora = Date.now()): Jogo | null {
+  return (
+    jogos.find((j) => j.status === 'ao_vivo') ??
+    jogos
+      .filter((j) => j.status === 'agendado' && new Date(j.inicio).getTime() > agora)
+      .sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime())[0] ??
+    null
+  );
+}

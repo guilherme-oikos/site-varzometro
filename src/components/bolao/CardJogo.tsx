@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import AvatarAutor from '@/components/painel/AvatarAutor';
+import BancadaAcha from '@/components/bolao/BancadaAcha';
 import Escudo from '@/components/bolao/Escudo';
 import SeloPontos from '@/components/bolao/SeloPontos';
 import {
@@ -109,6 +110,8 @@ export default function CardJogo({
       {autores.length > 0 ? (
         <div className="mt-4 border-t border-ink-line pt-4">
           {visiveis ? (
+            <>
+            <BancadaAcha jogo={jogo} palpites={palpites} />
             <ul className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {autores.map((autor) => {
                 const palpite = palpites.find((p) => p.autor_id === autor.id);
@@ -151,6 +154,7 @@ export default function CardJogo({
                 );
               })}
             </ul>
+            </>
           ) : (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted">
               {/* Lado a lado, sem sobrepor: quem não tem foto é só iniciais, e iniciais sobrepostas não se leem. */}

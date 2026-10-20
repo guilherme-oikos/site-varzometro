@@ -2,6 +2,7 @@ import Hero from '@/components/Hero';
 import Pilares from '@/components/Pilares';
 import Manifesto from '@/components/Manifesto';
 import Bancada from '@/components/Bancada';
+import BolaoNaHome from '@/components/BolaoNaHome';
 import SecaoMidia from '@/components/SecaoMidia';
 import BlogSection from '@/components/BlogSection';
 import { site, socials } from '@/lib/site';
@@ -37,6 +38,7 @@ export default function HomePage() {
       <Pilares />
       <Manifesto />
       <Bancada />
+      <BolaoNaHome />
       <SecaoMidia />
       <BlogSection />
 
