@@ -189,14 +189,14 @@ export default function FormPalpites({
                             type="button"
                             onClick={() => alternarZebra(jogo)}
                             aria-pressed={rascunho[jogo.id]?.dobrado ?? false}
-                            title="Zebra da rodada: este jogo vale o dobro. Uma por rodada."
+                            title="Dobro de pontos: este jogo vale o dobro. Um por rodada."
                             className={`toque inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold transition-colors ${
                               rascunho[jogo.id]?.dobrado
                                 ? 'border-primary bg-primary text-ink'
                                 : 'border-ink-line text-zinc-300 hover:border-primary/60 hover:text-white'
                             }`}
                           >
-                            <span className="numerico">2x</span> Zebra
+                            <span className="numerico">2x</span> Dobro
                           </button>
                         )}
                       </div>
@@ -204,7 +204,7 @@ export default function FormPalpites({
                     {aberto && zebraTravada(jogo.rodada) ? (
                       // Sem botão desabilitado mudo: o motivo só aparecia no `title`, que no celular nem existe.
                       <p className="mt-2 text-xs text-muted">
-                        <span className="numerico font-bold text-primary">2x</span> Sua zebra da rodada {jogo.rodada} já foi em{' '}
+                        <span className="numerico font-bold text-primary">2x</span> Seu dobro de pontos da rodada {jogo.rodada} já foi em{' '}
                         {zebraTravada(jogo.rodada)!.mandante} x {zebraTravada(jogo.rodada)!.visitante}, que já começou.
                       </p>
                     ) : null}

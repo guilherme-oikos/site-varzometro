@@ -77,6 +77,16 @@ export function vezesPorFaixa(linha: LinhaRanking): Record<(typeof REGRAS)[numbe
   return { 5: linha.exatos, 3: linha.vencedor_e_gols, 2: linha.so_vencedor, 1: linha.so_gols };
 }
 
+/**
+ * Pontos a mais que vieram do dobro de pontos: o total menos o que as faixas
+ * dariam sem ele. `pontos` já vem dobrado do banco; as faixas, não.
+ */
+export function pontosDoDobro(linha: LinhaRanking): number {
+  const vezes = vezesPorFaixa(linha);
+  const semDobro = REGRAS.reduce((soma, regra) => soma + regra.pontos * vezes[regra.pontos], 0);
+  return Math.max(0, linha.pontos - semDobro);
+}
+
 /** Colunas de `bolao_jogos` que as telas usam. */
 export const COLUNAS_JOGO =
   'id, temporada, rodada, mandante, mandante_sigla, mandante_escudo, visitante, visitante_sigla, ' +
@@ -90,7 +100,7 @@ export const REGRAS = [
 ] as const;
 
 /** Mesma regra do trigger `bolao_uma_zebra_por_rodada`. */
-export const REGRA_ZEBRA = 'Zebra: em um jogo por rodada, os pontos valem o dobro.';
+export const REGRA_ZEBRA = 'Dobro de pontos: em um jogo por rodada, os pontos valem o dobro.';
 
 /** Mesma regra de `bolao_aberto` no banco. Aqui é só para a tela; quem barra é a RLS. */
 export function jogoAberto(jogo: Jogo, agora = Date.now()): boolean {

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import AvatarAutor from '@/components/painel/AvatarAutor';
 import SeloPontos from '@/components/bolao/SeloPontos';
-import { paraSlug, posicoes, REGRAS, vezesPorFaixa, type LinhaRanking } from '@/lib/bolao';
+import { paraSlug, pontosDoDobro, posicoes, REGRAS, vezesPorFaixa, type LinhaRanking } from '@/lib/bolao';
 import { seloDoArtigo, siglaDeClube } from '@/lib/site';
 
 /**
@@ -10,7 +10,9 @@ import { seloDoArtigo, siglaDeClube } from '@/lib/site';
  *
  * Uma coluna por faixa de `REGRAS` (+5, +3, +2, +1), com o mesmo selo do
  * "Como pontua" no cabeçalho, para dar para ler de onde saiu cada ponto. Zero
- * fica apagado, para o que a pessoa acertou saltar aos olhos.
+ * fica apagado, para o que a pessoa acertou saltar aos olhos. A coluna "2x"
+ * mostra quantos pontos vieram do dobro de pontos: sem ela, a soma das faixas
+ * não bate com o total.
  *
  * Com `oficial`, a tabela é a prévia "se acabasse agora": cada linha mostra
  * quantas posições subiu ou desceu e quantos pontos os jogos rolando dariam.
@@ -47,6 +49,12 @@ export default function TabelaRanking({
                 <span className="sr-only">{regra.texto}</span>
               </th>
             ))}
+            <th scope="col" className="w-9 px-0.5 py-3 text-center" title="Pontos a mais pelo dobro de pontos">
+              <span className="t-micro numerico inline-flex justify-center rounded-full bg-primary/15 px-1.5 py-0.5 font-bold text-primary">
+                2x
+              </span>
+              <span className="sr-only">Pontos a mais pelo dobro de pontos</span>
+            </th>
             <th scope="col" className="t-micro w-12 py-3 pl-2 pr-3 text-right uppercase sm:pr-5">Pts</th>
           </tr>
         </thead>
@@ -56,6 +64,7 @@ export default function TabelaRanking({
             const selo = seloDoArtigo(siglaDeClube(linha.clube));
             const lidera = lider !== null && linha.pontos === lider;
             const vezes = vezesPorFaixa(linha);
+            const dobro = pontosDoDobro(linha);
             const antesDele = antes.get(linha.autor_id);
             const subiu = antesDele ? antesDele.lugar - lugares[indice] : 0;
             const ganha = antesDele ? linha.pontos - antesDele.pontos : 0;
@@ -104,6 +113,9 @@ export default function TabelaRanking({
                     </td>
                   );
                 })}
+                <td className={`numerico px-0.5 py-3 text-center ${dobro > 0 ? 'font-bold text-primary' : 'text-zinc-600'}`}>
+                  {dobro > 0 ? `+${dobro}` : 0}
+                </td>
                 <td className="numerico py-3 pl-2 pr-3 text-right text-lg font-extrabold text-white sm:pr-5">
                   {linha.pontos}
                   {ganha > 0 ? (

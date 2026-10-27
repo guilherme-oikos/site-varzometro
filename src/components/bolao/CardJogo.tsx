@@ -128,7 +128,7 @@ export default function CardJogo({
                         <>
                           {palpite.dobrado ? (
                             <span
-                              title="Zebra da rodada: este palpite vale o dobro"
+                              title="Dobro de pontos: este palpite vale o dobro"
                               className="t-micro numerico rounded-md bg-primary/15 px-1.5 py-0.5 font-bold text-primary"
                             >
                               2x

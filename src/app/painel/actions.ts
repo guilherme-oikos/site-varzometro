@@ -317,7 +317,7 @@ export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado
       return { ok: false, erro: `A resenha cabe em até ${RESENHA_MAX} caracteres.` };
     }
     if ((resenha || dobrado) && mandante === null) {
-      return { ok: false, erro: 'Resenha e zebra precisam de um placar no mesmo jogo.' };
+      return { ok: false, erro: 'Resenha e dobro de pontos precisam de um placar no mesmo jogo.' };
     }
 
     if (mandante === null || visitante === null) {
@@ -337,7 +337,7 @@ export async function salvarPalpites(lista: PalpiteEnviado[]): Promise<Resultado
     if (error) {
       // P0001: o trigger da zebra — a desta rodada já está num jogo que começou.
       if (error.code === 'P0001') {
-        return { ok: false, erro: 'A zebra desta rodada já foi usada num jogo que começou. Os palpites anteriores foram salvos.' };
+        return { ok: false, erro: 'O dobro de pontos desta rodada já foi usado num jogo que começou. Os palpites anteriores foram salvos.' };
       }
       // PGRST204: coluna que não existe — o 0004_resenha_e_zebra.sql não rodou.
       if (error.code === 'PGRST204') {
