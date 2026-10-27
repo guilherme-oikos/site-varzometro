@@ -182,6 +182,34 @@ export function somarNoRanking(ranking: LinhaRanking[], extras: Palpite[]): Linh
     );
 }
 
+/** Jogo com um dos quatro grandes de SP de um lado (ou dos dois, no clássico). */
+export function jogoDeGrande(jogo: Pick<Jogo, 'mandante' | 'visitante'>): boolean {
+  return GRANDES.has(jogo.mandante) || GRANDES.has(jogo.visitante);
+}
+
+/**
+ * O ranking contando só os jogos dos quatro grandes: todo mundo do zero, mais
+ * os palpites pontuados desses jogos. Os pontos são os do banco (ou os da
+ * prévia ao vivo, se vierem junto); aqui só se escolhe quais entram.
+ */
+export function rankingDosGrandes(ranking: LinhaRanking[], jogos: Jogo[], palpites: Palpite[]): LinhaRanking[] {
+  const ids = new Set(jogos.filter(jogoDeGrande).map((jogo) => jogo.id));
+  const zerado = ranking.map((linha) => ({
+    ...linha,
+    pontos: 0,
+    exatos: 0,
+    resultados: 0,
+    jogos_pontuados: 0,
+    vencedor_e_gols: 0,
+    so_vencedor: 0,
+    so_gols: 0,
+  }));
+  return somarNoRanking(
+    zerado,
+    palpites.filter((palpite) => ids.has(palpite.jogo_id)),
+  );
+}
+
 export const rotuloStatus: Record<StatusJogo, string> = {
   agendado: 'Agendado',
   ao_vivo: 'Rolando',

@@ -21,6 +21,7 @@ import {
   palpitesAoVivo,
   paraSlug,
   placarDaRodada,
+  rankingDosGrandes,
   rodadaAtual,
   somarNoRanking,
   timesDoBolao,
@@ -49,8 +50,12 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
 
   // "Se acabasse agora": o ranking oficial mais o que os jogos rolando dariam.
   const rolando = bolao?.jogos.filter((jogo) => jogo.status === 'ao_vivo') ?? [];
-  const rankingAoVivo =
-    bolao && rolando.length > 0 ? somarNoRanking(bolao.ranking, palpitesAoVivo(rolando, await getPalpitesAoVivoPublico())) : null;
+  const parciais = bolao && rolando.length > 0 ? palpitesAoVivo(rolando, await getPalpitesAoVivoPublico()) : null;
+  const rankingAoVivo = bolao && parciais ? somarNoRanking(bolao.ranking, parciais) : null;
+  // O mesmo ranking contando só os jogos de Corinthians, Palmeiras, Santos e São Paulo.
+  const rankingGrandes = bolao ? rankingDosGrandes(bolao.ranking, bolao.jogos, historico) : [];
+  const rankingGrandesAoVivo =
+    bolao && parciais ? rankingDosGrandes(bolao.ranking, bolao.jogos, [...historico, ...parciais]) : null;
   // Horários para o navegador saber quando há jogo rolando: os que podem estar
   // rolando agora e os da próxima semana (a página pode ter sido montada antes do apito).
   const inicios =
@@ -150,6 +155,10 @@ export default async function PaginaBolao({ rodada }: { rodada?: number }) {
                 <AlternarRanking
                   oficial={<TabelaRanking ranking={bolao.ranking} />}
                   aoVivo={rankingAoVivo ? <TabelaRanking ranking={rankingAoVivo} oficial={bolao.ranking} /> : null}
+                  grandes={<TabelaRanking ranking={rankingGrandes} />}
+                  grandesAoVivo={
+                    rankingGrandesAoVivo ? <TabelaRanking ranking={rankingGrandesAoVivo} oficial={rankingGrandes} /> : null
+                  }
                   rolando={rolando.length}
                 />
               </div>
